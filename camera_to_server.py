@@ -141,7 +141,7 @@ def function(model, server, cam_ip):
 def see_raw_image(cam_ip: str = Form(...)):
     single_shot(cam_ip)
     # i.save('/home/{}/Downloads/images/{}.png'.format(user, datetime.datetime.now()))
-    return FileResponse('resources/images/raw_image.png')
+    return FileResponse('images/raw_image.png')
 
 
 @app.post("/detect")
@@ -154,7 +154,7 @@ def detect_object(model: str = Form(...), server: str = Form(...), cam_ip: str =
 def save_labeled_image(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...)):
     answer = function(model, server, cam_ip)
     if len(answer["bounding-boxes"]) > 0:
-        return FileResponse('resources/images/labeled_image.png')
+        return FileResponse('images/labeled_image.png')
 
 
 if __name__ == '__main__':
