@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+import "hemistereo/network/messages/point.proto";
+
+package hs.network.proto.messages;
+
+option go_package = "git.3dvisionlabs.com/3dvisionlabs/software/hemistereo/genproto.git/proto/spaces";
+message Space {
+
+    enum EvalType {
+        Off = 0;
+        NumPoints = 1;
+        Area = 2;
+        Volume = 3;
+    }
+
+    uint32 id = 1;
+    uint32 plane_id = 2;
+    string name = 3;
+    double height = 4;
+    double offset = 5;
+    repeated Point2f plane_points = 6;
+    double fill_thresh_min = 7;
+    double fill_thresh_max = 8;
+    EvalType eval_type = 9;
+    repeated Point2f image_points = 10;
+}

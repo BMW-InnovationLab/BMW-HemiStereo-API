@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+// option optimize_for = LITE_RUNTIME;
+
+option go_package = "git.3dvisionlabs.com/3dvisionlabs/software/hemistereo/genproto.git/proto/hemistereo/network/messages";
+
+package hs.network.proto.messages;
+
+/* A message representing a matrix. */
+message Matrix {
+    enum Depth {
+        Unknown = 0;    // Unknown depth
+        Int8 = 1;       // 8-bit signed integer
+        UInt8 = 2;      // 8-bit unsigned integer
+        Int16 = 3;      // 16-bit signed integer
+        UInt16 = 4;     // 16-bit unsigned integer
+        Int32 = 5;      // 32-bit signed integer
+        UInt32 = 6;     // 32-bit unsigned integer
+        Int64 = 7;      // 64-bit signed integer
+        UInt64 = 8;     // 64-bit unsigned integer
+        Float = 9;      // 32-bit floating point
+        Double = 10;    // 64-bit floating point
+    }
+
+    uint32 rows = 1;        // The number of rows.
+    uint32 cols = 2;        // The number of columns.
+    uint32 channels = 3;    // The number of channels.
+    Depth depth = 4;        // The depth of the element data type.
+    bytes data = 5;         // The matrix data in row-major order.
+}

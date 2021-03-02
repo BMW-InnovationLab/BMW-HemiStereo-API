@@ -1,0 +1,28 @@
+default:
+    image: 3dvl/python-base:1.0.0
+
+build:
+    script:
+         - git submodule init
+         - git submodule sync --recursive
+         - git submodule update --recursive
+         - python3 setup.py build
+         - python3 setup.py sdist bdist_wheel
+    tags:
+         - lnx-x86_64
+    only:
+         - master
+
+release:
+    script:
+         - git submodule init
+         - git submodule sync --recursive
+         - git submodule update --recursive
+         - python3 setup.py build
+         - python3 setup.py sdist bdist_wheel
+         - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --repository-url https://git.3dvisionlabs.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi dist/*
+    tags:
+         - lnx-x86_64
+    only:
+         - tags
+

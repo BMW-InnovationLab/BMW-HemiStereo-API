@@ -1,0 +1,320 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "hemistereo/network/messages/message.proto";
+
+option go_package = "git.3dvisionlabs.com/3dvisionlabs/software/hemistereo/genproto.git/proto/hemistereo/network/services";
+package hs.network.proto;
+
+/* Represents a 32-bit signed integer. */
+message PropertyInt32 {
+  int32 value = 1;  // The property value.
+  int32 min = 2;    // Lower bound of the property.
+  int32 max = 3;    // Upper bound of the property.
+  int32 step = 4;   // Step between two consecutive values (0 if disabled)
+}
+
+/* Represents a 64-bit signed integer. */
+message PropertyInt64 {
+  int64 value = 1;  // The property value.
+  int64 min = 2;    // Lower bound of the property.
+  int64 max = 3;    // Upper bound of the property.
+  int64 step = 4;   // Step between two consecutive values (0 if disabled)
+}
+
+/* Represents a 32-bit unsigned integer. */
+message PropertyUInt32 {
+  uint32 value = 1;  // The property value.
+  uint32 min = 2;    // Lower bound of the property.
+  uint32 max = 3;    // Upper bound of the property.
+  uint32 step = 4;   // Step between two consecutive values (0 if disabled)
+}
+
+/* Represents a 64-bit unsigned integer. */
+message PropertyUInt64 {
+  uint64 value = 1;  // The property value.
+  uint64 min = 2;    // Lower bound of the property.
+  uint64 max = 3;    // Upper bound of the property.
+  uint64 step = 4;   // Step between two consecutive values (0 if disabled)
+}
+
+/* Represents a floating-point number. */
+message PropertyFloat {
+  float value = 1;  // The property value.
+  float min = 2;    // Lower bound of the property.
+  float max = 3;    // Upper bound of the property.
+  float step = 4;   // Step between two consecutive values (0 if disabled)
+}
+
+/* Represents a double-precision floating-point number. */
+message PropertyDouble {
+  double value = 1;  // The property value.
+  double min = 2;    // Lower bound of the property.
+  double max = 3;    // Upper bound of the property.
+  double step = 4;   // Step between two consecutive values (0 if disabled)
+}
+
+/* Represents a Boolean value. */
+message PropertyBool {
+  bool value = 1;  // Value of the property, can be true or false.
+}
+
+/* Represents an enumeration type. */
+message PropertyEnum {
+  int32 value = 1;                   // The property value.
+  map<int32, string> value_map = 2;  // The value map containing possible values
+                                     // and their string representation.
+}
+
+/* Represents a string type. */
+message PropertyString {
+  string value = 1;  // The property value.
+}
+
+/* Represents a property containing a single datatype. */
+message Property {
+  oneof property_oneof {
+    PropertyInt32 prop_int32 = 1;    // A 32 bit signed integer property.
+    PropertyInt64 prop_int64 = 2;    // A 64 bit signed integer property.
+    PropertyUInt32 prop_uint32 = 3;  // A 32 bit unsigned integer property.
+    PropertyUInt64 prop_uint64 = 4;  // A 64 bit unsigned integer property.
+    PropertyFloat prop_float = 5;    // A 32 bit floating point property.
+    PropertyDouble prop_double = 6;  // A 64 bit floating point property.
+    PropertyString prop_string = 7;  // A string property.
+    PropertyBool prop_bool = 8;      // A boolean property.
+    PropertyEnum prop_enum = 9;      // An enumeration property.
+  }
+  string displayname = 20;  // Name of the property.
+  string description = 21;  // Description of the property.
+}
+
+/* Represents the input to a Node. */
+message Input {
+  string type = 1;  // Defines the type of input to the Node.
+}
+
+/* Represents the output from a Node. */
+message Output {
+  string type = 1;  // Defines the type of output from a Node.
+}
+
+message Method {
+  string typeIn = 1;   // Defines the type of the method's input parameter.
+  string typeOut = 2;  // Defines the type of the method's output parameter.
+}
+
+/* Represents a specific application with corresponding properties, inputs and
+ * outputs. */
+message Node {
+  map<string, Property> properties =
+      1;  // Represents the properties of the application as a map.
+  map<string, Input> inputs =
+      2;  // Represents the inputs of the application as a map.
+  map<string, Output> outputs =
+      3;  // Represents the outputs of the application as a map.
+  map<string, Method> methods = 4;
+}
+
+/* Represents a request to get the current application. */
+message GetApplicationRequest {}
+
+/* Represents a request to get a Node. */
+message GetNodeRequest {
+  string path = 1;  // Represents the path to a Node to be requested.
+}
+
+/* Represents a request to get a Property. */
+message GetPropertyRequest {
+  string path = 1;  // Represents the path to a Property to be requested.
+}
+
+/* Represents a request to set a Property. */
+message SetPropertyRequest {
+  string path = 1;  // Represents the path to the property to be set.
+  oneof value_oneof {
+    int32 value_int32 = 2;  // The value of a 32 bit signed integer property.
+    int64 value_int64 = 3;  // The value of a 64 bit signed integer property.
+    uint32 value_uint32 =
+        4;  // The value of a 32 bit unsigned integer property.
+    uint64 value_uint64 =
+        5;                  // The value of a 64 bit unsigned integer property.
+    float value_float = 6;  // The value of a 32 bit floating point property.
+    double value_double = 7;  // The value of a 64 bit floating point property.
+    string value_string = 8;  // The value of a string property.
+    bool value_bool = 9;      // The value of a boolean property.
+    int32 value_enum = 10;    // The value of an enumeration property.
+  }
+}
+
+/* Represents a request to subscribe to a topic. */
+message SubscribeTopicRequest {
+  string path = 1;  // The path of the topic.
+}
+
+/* Represents a request to read a topic. */
+message ReadTopicRequest {
+  // The path of the topic.
+  string path = 1;
+  // The timestamp of the previous message. The call will block until newer
+  // message is available.
+  uint32 prev_message_id = 2;
+}
+
+/* Represents the response to write to a topic. */
+message ReadTopicResponse {
+  uint32 message_id = 1;                       // The message id.
+  hs.network.proto.messages.Message data = 2;  // The message.
+}
+
+/* Represents a request to write to a topic. */
+message WriteTopicRequest {
+  // The path of the topic.
+  string path = 1;
+  // The message that should be written.
+  hs.network.proto.messages.Message data = 2;
+}
+
+/* Represents the response to write to a topic. */
+message WriteTopicResponse {}
+
+/* Represents a request to subscribe to events. */
+message SubscribeEventsRequest {}
+
+message CallRequest {
+  string path = 1;  // The path of the method.
+  hs.network.proto.messages.Message data =
+      2;  // The input parameter of the method.
+}
+
+/* Represents an event. */
+message Event {
+  enum Type {
+    Unknown = 0;          // An unknown Event occured.
+    InputAdded = 1;       // An Input has been added.
+    InputRemoved = 2;     // An Input has been removed.
+    OutputAdded = 3;      // An Output has been added.
+    OutputRemoved = 4;    // An Output has been removed.
+    PropertyAdded = 5;    // A Property has been added.
+    PropertyRemoved = 6;  // A Property has been removed.
+    PropertyChanged = 7;  // A Property has been changed.
+    MethodAdded = 8;      // A Method has been added.
+    MethodRemoved = 9;    // A Method has been removed.
+  }
+
+  Type type = 1;    // The type of the Event.
+  string path = 2;  // The path to the corresponding object.
+  oneof data {
+    Input input =
+        3;  // The Input message. Field is only set on an InputAdded event.
+    Output output =
+        4;  // The Output message. Field is only set on an OutputAdded event.
+    Property property = 5;  // The Property message. Field is only set on
+                            // PropertyAdded and PropertyChanged events.
+    Method method =
+        6;  // The Method message. Field is only set on an MethodAdded event.
+  }
+}
+
+/* Represents a request to query if topic reads are enabled. */
+message GetReadTopicEnabledRequest {
+  string path = 1;  // The path of the topic.
+}
+
+/* Represents the response to query if topic reads are enabled. */
+message GetReadTopicEnabledResponse {
+  bool value = 1;  // Indicates if topic reads are enabled.
+}
+
+/* Request to enable/disable topic reads. */
+message SetReadTopicEnabledRequest {
+  string path = 1;  // The path of the topic.
+  bool value = 2;   // Enables or disables topic reads.
+}
+
+message SetReadTopicEnabledResponse {}
+
+service ApplicationService {
+  /* Used to get the current Application. */
+  rpc GetApplication(GetApplicationRequest) returns (Node) {
+    option (google.api.http) = {
+      get: "/api/application"
+    };
+  }
+
+  /* Used to get the Node at {path}. */
+  rpc GetNode(GetNodeRequest) returns (Node) {
+    option (google.api.http) = {
+      get: "/api/application/node/{path}"
+    };
+  }
+
+  /* Used to get the property at {path}. */
+  rpc GetProperty(GetPropertyRequest) returns (Property) {
+    option (google.api.http) = {
+      get: "/api/application/property/{path}"
+    };
+  }
+
+  /* Used to set a property at {path} to {value}. */
+  rpc SetProperty(SetPropertyRequest) returns (Property) {
+    option (google.api.http) = {
+      put: "/api/application/property/{path}"
+      body: "*"
+    };
+  }
+
+  /* Used to subscribe to updates to a topic at {path}. */
+  rpc SubscribeTopic(SubscribeTopicRequest)
+      returns (stream hs.network.proto.messages.Message) {
+    option (google.api.http) = {
+      get: "/api/application/output/{path}/subscribe"
+    };
+  }
+
+  /* Used to read a topic at {path}. */
+  rpc ReadTopic(ReadTopicRequest) returns (ReadTopicResponse) {
+    option (google.api.http) = {
+      get: "/api/application/output/{path}/read"
+    };
+  }
+
+  /* Used to query if topic reads are enabled for topic at {path}. */
+  rpc GetReadTopicEnabled(GetReadTopicEnabledRequest)
+      returns (GetReadTopicEnabledResponse) {
+    option (google.api.http) = {
+      get: "/api/application/output/{path}/read-enabled"
+    };
+  }
+
+  /* Used to enable/disable topic reads for topic at {path}. */
+  rpc SetReadTopicEnabled(SetReadTopicEnabledRequest)
+      returns (SetReadTopicEnabledResponse) {
+    option (google.api.http) = {
+      put: "/api/application/output/{path}/set-read-enabled"
+      body: "value"
+    };
+  }
+
+  /* Used to write data to a topic at {path}. */
+  rpc WriteTopic(WriteTopicRequest) returns (WriteTopicResponse) {
+    option (google.api.http) = {
+      put: "/api/application/output/{path}/write"
+      body: "data"
+    };
+  }
+
+  /* Used to subscribe to events of the current application. */
+  rpc SubscribeEvents(SubscribeEventsRequest) returns (stream Event) {
+    option (google.api.http) = {
+      get: "/api/application/events"
+    };
+  }
+
+  /* Used to call a method at {path}. */
+  rpc CallMethod(CallRequest) returns (hs.network.proto.messages.Message) {
+    option (google.api.http) = {
+      post: "/api/application/call/{path}"
+      body: "data"
+    };
+  }
+}

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+option go_package = "git.3dvisionlabs.com/3dvisionlabs/software/hemistereo/genproto.git/proto/hemistereo/network/messages";
+
+// option optimize_for = LITE_RUNTIME;
+
+package hs.network.proto.messages;
+
+/* Represents a message. */
+message Message {
+    int64 timestamp = 1;                // The message timestamp.
+    google.protobuf.Any payload = 2;    // The message payload.
+    string type = 3;                    // The data type of the message payload.
+}
+
+/* Represents a message map. */
+message MessageMap {
+    map<string, Message> map = 1;       // A map that contains multiple messages accessible by name.
+}

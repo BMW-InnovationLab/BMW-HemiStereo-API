@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package hs.network.proto.messages;
+
+option go_package = "git.3dvisionlabs.com/3dvisionlabs/software/hemistereo/genproto.git/proto/hemistereo/network/messages";
+
+/* A message containing a 32 bit signed integer. */
+message Int32 {
+  int32 value = 1;
+}
+
+/* A message containing a 32 bit unsigned integer. */
+message UInt32 {
+  uint32 value = 1;
+}
+
+
+/* A message containing a 64 bit signed integer. */
+message Int64 {
+  int64 value = 1;
+}
+
+/* A message containing a 64 bit unsigned integer. */
+message UInt64 {
+  uint64 value = 1;
+}
+
+/* A message holding a 32 bit floating point value. */
+message Float {
+  float value = 1;
+}
+
+/* A message holding a 64 bit floating point value. */
+message Double {
+  double value = 1;
+}
+
+/* A message holding a boolean. */
+message Bool {
+  bool value = 1;
+}
+
+/* A message holding a string. */
+message String {
+  string value = 1;
+}

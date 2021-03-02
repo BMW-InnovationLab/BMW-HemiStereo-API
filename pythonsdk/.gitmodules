@@ -1,0 +1,3 @@
+[submodule "api"]
+	path = api
+	url = https://git.3dvisionlabs.com/3dvisionlabs/software/hemistereo/api.git

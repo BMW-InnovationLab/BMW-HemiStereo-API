@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "hemistereo/network/messages/matrix.proto";
+
+package hs.network.proto.messages;
+
+option go_package = "git.3dvisionlabs.com/3dvisionlabs/software/hemistereo/genproto.git/proto/spaces";
+
+message Pointcloud {
+    Matrix colorimg = 1;
+    Matrix pointcloud = 2;
+}

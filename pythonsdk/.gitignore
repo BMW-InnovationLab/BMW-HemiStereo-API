@@ -1,0 +1,6 @@
+__pycache__
+*.swp
+hemistereo/api
+build
+hemistereo.egg-info/
+dist

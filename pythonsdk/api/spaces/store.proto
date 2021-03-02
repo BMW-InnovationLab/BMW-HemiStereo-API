@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "spaces/plane.proto";
+import "spaces/space.proto";
+
+package hs.network.proto.messages;
+
+option go_package = "git.3dvisionlabs.com/3dvisionlabs/software/hemistereo/genproto.git/proto/spaces";
+message Store {
+    repeated Plane planes = 1;
+    repeated Space spaces = 2;
+}

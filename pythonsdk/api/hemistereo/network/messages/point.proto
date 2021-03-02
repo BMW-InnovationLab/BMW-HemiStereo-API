@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package hs.network.proto.messages;
+
+option go_package = "git.3dvisionlabs.com/3dvisionlabs/software/hemistereo/genproto.git/proto/hemistereo/network/messages";
+
+/* Represents a two-dimensional point with 32-bit floating point coordinates. */
+message Point2f {
+    float x = 1;    // The x-coordinate.
+    float y = 2;    // The y-coordinate.
+}
+
+/* Represents a two-dimensional point with 64-bit floating point coordinates. */
+message Point2d {
+    double x = 1;    // The x-coordinate.
+    double y = 2;    // The y-coordinate.
+}
+
+/* Represents a three-dimensional point with 32-bit floating point coordinates. */
+message Point3f {
+    float x = 1;    // The x-coordinate.
+    float y = 2;    // The y-coordinate.
+    float z = 3;    // The z-coordinate.
+}
+
+/* Represents a three-dimensional point with 64-bit floating point coordinates. */
+message Point3d {
+    double x = 1;    // The x-coordinate.
+    double y = 2;    // The y-coordinate.
+    double z = 3;    // The z-coordinate.
+}
+
+/* A message containing a list of Point2f. */
+message ListPoint2f {
+    repeated Point2f points = 1;    // Repeated field containing the points.
+}
+
+/* A message containing a list of Point2d. */
+message ListPoint2d {
+    repeated Point2d points = 1;    // Repeated field containing the points.
+}
+
+/* A message containing a list of Point3f. */
+message ListPoint3f {
+    repeated Point3f points = 1;    // Repeated field containing the points.
+}
+
+/* A message containing a list of Point3d. */
+message ListPoint3d {
+    repeated Point3d points = 1;    // Repeated field containing the points.
+}
+

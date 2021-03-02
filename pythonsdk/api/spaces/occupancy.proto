@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package hs.network.proto.messages;
+
+option go_package = "git.3dvisionlabs.com/3dvisionlabs/software/hemistereo/genproto.git/proto/spaces";
+
+message Occupancy {
+    uint32 space_id = 1;
+    uint32 num_points = 2;
+    double area_fill = 3;
+    double volume_fill = 4;
+    uint32 sensor_id = 5;
+    int64 timestamp = 6;
+}
+
+message ListOccupancy {
+    repeated Occupancy occupancies = 1;
+}
+
+message OccupancyRequest {
+    int64 timestamp_min = 1;
+    int64 timestamp_max = 2;
+    int64 timestamp_resolution = 3;
+    uint32 sensor_id = 4;
+    uint32 space_id = 5;
+}

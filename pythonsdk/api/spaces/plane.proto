@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+import "hemistereo/network/messages/matrix.proto";
+import "hemistereo/network/messages/point.proto";
+
+package hs.network.proto.messages;
+
+option go_package = "git.3dvisionlabs.com/3dvisionlabs/software/hemistereo/genproto.git/proto/spaces";
+message Plane {
+
+    enum CalibType {
+        Unknown = 0;
+        ImagePoints = 1;
+        ImagePolygon = 2;
+    }
+
+    Matrix transform = 1;
+    uint32 id = 2;
+    string name = 3;
+    repeated Point2f image_points = 4;
+    CalibType calib_type = 5;
+}
