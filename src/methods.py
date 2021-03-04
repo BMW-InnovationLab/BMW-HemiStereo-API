@@ -6,6 +6,7 @@ from io import BytesIO
 import ast
 import getpass
 from numpy import *
+import sys
 
 user = getpass.getuser()
 ppm_w = 14.4
@@ -85,7 +86,6 @@ def function(model, server, cam_ip):
                         nearest_pixel = distance[j][i][0]
                     if distance[j][i] > far_pixel:
                         far_pixel = distance[j][i][0]
-                        print(far_pixel)
 
             cv2.rectangle(np, (right, top), (left, bottom), (255, 0, 0), 2)
             img = Image.fromarray(np, 'RGB')
