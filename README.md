@@ -33,7 +33,7 @@ Install the Hemistereo Viewer Software following the [official docs](https://3dv
 In order to build the project run the following command from the project's root directory:
 
 ```shell
-sudo docker build -t hemisterei_inference_api -f docker/Dockerfile .
+sudo docker build -t hemistereo_inference_api -f docker/Dockerfile .
 ```
 
 ### Behind a proxy
