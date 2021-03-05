@@ -13,8 +13,8 @@ ppm_w = 14.4
 ppm_h = 20.75
 cx = 1023 / 2
 cy = 767 / 2
-h_sensor = 3040
-w_sensor = 4032
+h_sensor = 800
+w_sensor = 1024
 fc1 = 1155.309825940708606140106
 theta_d_max = 1.74532925199432953355938
 field_of_view_h = 180
@@ -35,6 +35,10 @@ fov_v_rad = field_of_view_v * math.pi / 180
 
 def single_shot(cam_ip):
     ctx = Context(appname="stereo", server=cam_ip, port="8888")
+    ctx.setProperty("stereo_target_camera_enabled", bool(1))
+    ctx.setProperty("stereo_target_camera_model", 5)
+    print(ctx.getProperty("stereo_target_image_width"))
+    print(ctx.getProperty("stereo_target_image_height"))
     msg = ctx.readTopic("image")
     np = unpackMessageToNumpy(msg.data)
     i = Image.fromarray(np)
@@ -56,7 +60,11 @@ def get_answer(model, server):
     return request_dict
 
 
-def function(model, server, cam_ip):
+def get_distance():
+    pass
+
+
+def detect(model, server, cam_ip):
     ctx = single_shot(cam_ip)
     msg = ctx.readTopic("image")
     np = unpackMessageToNumpy(msg.data)
@@ -94,10 +102,11 @@ def function(model, server, cam_ip):
 
             # Variable Distance Camera
             height_px = bottom - top
-            height_obj = nearest_pixel * (height_px / h_sensor) * theta_d_max / 2
+            print(height_px)
+            height_obj = nearest_pixel / 10 * (height_px / h_sensor) * fov_v_rad
 
             width_px = right - left
-            width_obj = nearest_pixel * (width_px / w_sensor) * fov_h_rad
+            width_obj = nearest_pixel / 10 * (width_px / w_sensor) * fov_h_rad * 1.75
 
             img.save('images/labeled_image.png')
             username = getpass.getuser()
@@ -108,7 +117,8 @@ def function(model, server, cam_ip):
         nearest_pixel = -1
 
     if nearest_pixel > 0:
-        answer['bounding-boxes'][box]['dimensions'] = {"depth": depth, "width": width_obj, "height": height_obj}
+        answer['bounding-boxes'][box]['dimensions'] = {"depth": depth, "width": float("{:.2f}".format(width_obj)),
+                                                       "height": float("{:.2f}".format(height_obj))}
         answer['bounding-boxes'][box]['distance'] = float(nearest_pixel / 10)
 
     else:

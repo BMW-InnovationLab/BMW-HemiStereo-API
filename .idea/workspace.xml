@@ -2,44 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c6ec6a84-3441-4f27-b921-5304ab71f614" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/images/distance_map.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/images/labeled_image.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/images/raw+dist.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/images/raw_image.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/camera_settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/camera_to_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/camera_to_server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/docker/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/distance_map.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/labeled_image.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/raw+dist.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/raw_image.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/methods.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/methods.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/.gitlab-ci.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/.gitlab-ci.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/.gitmodules" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/.gitmodules" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/LICENSE" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/api/.clang-format" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/api/.clang-format" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/api/google/api/annotations.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/api/google/api/annotations.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/api/google/api/http.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/api/google/api/http.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/api/hemistereo/network/messages/basic.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/api/hemistereo/network/messages/basic.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/api/hemistereo/network/messages/matrix.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/api/hemistereo/network/messages/matrix.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/api/hemistereo/network/messages/message.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/api/hemistereo/network/messages/message.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/api/hemistereo/network/messages/point.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/api/hemistereo/network/messages/point.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/api/hemistereo/network/services/application.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/api/hemistereo/network/services/application.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/api/spaces/occupancy.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/api/spaces/occupancy.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/api/spaces/plane.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/api/spaces/plane.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/api/spaces/pointcloud.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/api/spaces/pointcloud.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/api/spaces/sensor.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/api/spaces/sensor.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/api/spaces/space.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/api/spaces/space.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/api/spaces/store.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/api/spaces/store.proto" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/hemistereo/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/hemistereo/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/hemistereo/context.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/hemistereo/context.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/hemistereo/imgconvert.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/hemistereo/imgconvert.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/hemistereo/unpack.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/hemistereo/unpack.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/python-base/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/python-base/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pythonsdk/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/pythonsdk/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/camera_to_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/camera_to_server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/images/distance_map.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/distance_map.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/images/labeled_image.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/labeled_image.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/images/raw+dist.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/raw+dist.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/images/raw_image.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/raw_image.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/methods.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/methods.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,7 +46,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="full.screen.before.presentation.mode" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -177,6 +147,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="methods" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/methods.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="object_size" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="camera" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -198,42 +189,21 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="torch_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="camera" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/torch_test.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <list>
       <item itemvalue="Python.camera_to_server_endpoint" />
       <item itemvalue="Python.camera_to_server" />
-      <item itemvalue="Python.torch_test" />
       <item itemvalue="Python.Api_test" />
       <item itemvalue="Python.object_size" />
       <item itemvalue="Python.camera_to_server (1)" />
+      <item itemvalue="Python.methods" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.camera_to_server (1)" />
+        <item itemvalue="Python.methods" />
         <item itemvalue="Python.camera_to_server" />
         <item itemvalue="Python.object_size" />
         <item itemvalue="Python.Api_test" />
-        <item itemvalue="Python.torch_test" />
       </list>
     </recent_temporary>
   </component>
