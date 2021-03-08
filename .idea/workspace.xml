@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="c6ec6a84-3441-4f27-b921-5304ab71f614" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/camera_settings.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/camera_to_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/camera_to_server.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/images/labeled_image.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/labeled_image.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/images/raw_image.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/raw_image.png" afterDir="false" />

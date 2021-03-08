@@ -62,13 +62,35 @@ def get_answer(model, server):
 
 
 def calculate_distance(model, server, cam_ip):
-    pass
+    ctx = single_shot(cam_ip)
+    nearest_pixel = sys.maxsize
+    print('Sending image to api with specified model')
+    answer = get_answer(model, server)
+    message = ctx.readTopic("distance")
+    distance = unpackMessageToNumpy(message.data)
+
+    if len(answer["bounding-boxes"]) > 0:
+        for box in range(len(answer['bounding-boxes'])):
+            object_class_name = answer['bounding-boxes'][box]['ObjectClassName']
+            bounding_box = answer['bounding-boxes'][box]['coordinates']
+            bottom = bounding_box['bottom']
+            left = bounding_box['left']
+            right = bounding_box['right']
+            top = bounding_box['top']
+
+            for i in range(left, right):
+                for j in range(top, bottom):
+                    if distance[j][i] < nearest_pixel and distance[j][i] != 0:
+                        nearest_pixel = distance[j][i][0]
+    else:
+        nearest_pixel = -1
+    return nearest_pixel, ctx
 
 
 def detect(model, server, cam_ip):
     ctx = single_shot(cam_ip)
     msg = ctx.readTopic("image")
-    np = unpackMessageToNumpy(msg.data)
+    nump = unpackMessageToNumpy(msg.data)
     nearest_pixel = sys.maxsize
     far_pixel = 0
     width = 0
@@ -93,11 +115,13 @@ def detect(model, server, cam_ip):
                 for j in range(top, bottom):
                     if distance[j][i] < nearest_pixel and distance[j][i] != 0:
                         nearest_pixel = distance[j][i][0]
+                        textureness = 0.271 * (nearest_pixel / 10) + 9.52
+                        ctx.setProperty("stereo_textureness_filter_average_textureness", np.float32(textureness))
                     if distance[j][i] > far_pixel:
                         far_pixel = distance[j][i][0]
 
-            cv2.rectangle(np, (right, top), (left, bottom), (255, 0, 0), 2)
-            img = Image.fromarray(np, 'RGB')
+            cv2.rectangle(nump, (right, top), (left, bottom), (255, 0, 0), 2)
+            img = Image.fromarray(nump, 'RGB')
 
             depth = (far_pixel - nearest_pixel) / 10
 
@@ -123,15 +147,13 @@ def detect(model, server, cam_ip):
         answer['bounding-boxes'][box]['distance'] = float(nearest_pixel / 10)
 
     else:
-
         print("No objects labeled.")
 
     return answer
 
 
-def compute_threshold(cam_ip, distance):
-    ctx = Context(appname="stereo", server=cam_ip, port="8888")
-    textureness = 0.271 * float(distance) + 9.52
-    # textureness = int(textureness)
-    ctx.setProperty("stereo_textureness_filter_average_textureness", np.uint32(textureness))
+def compute_threshold(cam_ip, model, server):
+    distance, ctx = calculate_distance(model, server, cam_ip)
+    textureness = 0.271 * (distance/10) + 9.52
+    ctx.setProperty("stereo_textureness_filter_average_textureness", np.float32(textureness))
     return textureness

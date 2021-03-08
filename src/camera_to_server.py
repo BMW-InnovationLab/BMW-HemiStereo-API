@@ -45,29 +45,24 @@ def see_raw_image(model: str = Form(...), server: str = Form(...), cam_ip: str =
     # , detect(model, server, cam_ip)
 
 
+@app.post("/set_threshold")
+def set_threshold(cam_ip=Form(...), model=Form(...), server=Form(...)):
+    return compute_threshold(cam_ip, model, server)
+
+
 @app.post("/detect")
 def detect_object(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...)):
     # open('raw_image.png', server).write(r.content)
     return detect(model, server, cam_ip)
 
 
-@app.post("/set_threshold")
-def set_threshold(cam_ip=Form(...), distance=Form(...)):
-    return compute_threshold(cam_ip, distance)
-
-
 @app.post("/detect/save_image")
 def save_labeled_image(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...)):
     answer = detect(model, server, cam_ip)
     if len(answer["bounding-boxes"]) > 0:
-        # f = cv2.imread("images/labeled_image.png")
-        # b = bytearray(f)
-        # print(b)
         with open("images/labeled_image.png", "rb") as f:
             b = bytearray(f.read())
-
         return StreamingResponse(io.BytesIO(b), media_type="image/png")
-        # return FileResponse('images/labeled_image.png')
 
 
 if __name__ == '__main__':
