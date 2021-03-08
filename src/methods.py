@@ -7,6 +7,7 @@ import ast
 import getpass
 from numpy import *
 import sys
+import datetime
 
 user = getpass.getuser()
 ppm_w = 14.4
@@ -33,16 +34,16 @@ fov_v_rad = field_of_view_v * math.pi / 180
 #            [0, fy, cy],
 #            [0, 0, 1]])
 
+
 def single_shot(cam_ip):
     ctx = Context(appname="stereo", server=cam_ip, port="8888")
     ctx.setProperty("stereo_target_camera_enabled", bool(1))
     ctx.setProperty("stereo_target_camera_model", 5)
-    print(ctx.getProperty("stereo_target_image_width"))
-    print(ctx.getProperty("stereo_target_image_height"))
     msg = ctx.readTopic("image")
     np = unpackMessageToNumpy(msg.data)
     i = Image.fromarray(np)
     i.save('images/raw_image.png')
+    # i.save('/home/{}/Downloads/images/{}.png'.format(user, datetime.datetime.now()), 'PNG')
     return ctx
 
 
@@ -60,7 +61,7 @@ def get_answer(model, server):
     return request_dict
 
 
-def get_distance():
+def calculate_distance(model, server, cam_ip):
     pass
 
 
@@ -81,7 +82,7 @@ def detect(model, server, cam_ip):
 
     if len(answer["bounding-boxes"]) > 0:
         for box in range(len(answer['bounding-boxes'])):
-            objectClassName = answer['bounding-boxes'][box]['ObjectClassName']
+            object_class_name = answer['bounding-boxes'][box]['ObjectClassName']
             bounding_box = answer['bounding-boxes'][box]['coordinates']
             bottom = bounding_box['bottom']
             left = bounding_box['left']
@@ -126,3 +127,11 @@ def detect(model, server, cam_ip):
         print("No objects labeled.")
 
     return answer
+
+
+def compute_threshold(cam_ip, distance):
+    ctx = Context(appname="stereo", server=cam_ip, port="8888")
+    textureness = 0.271 * float(distance) + 9.52
+    # textureness = int(textureness)
+    ctx.setProperty("stereo_textureness_filter_average_textureness", np.uint32(textureness))
+    return textureness

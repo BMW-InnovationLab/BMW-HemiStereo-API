@@ -51,6 +51,11 @@ def detect_object(model: str = Form(...), server: str = Form(...), cam_ip: str =
     return detect(model, server, cam_ip)
 
 
+@app.post("/set_threshold")
+def set_threshold(cam_ip=Form(...), distance=Form(...)):
+    return compute_threshold(cam_ip, distance)
+
+
 @app.post("/detect/save_image")
 def save_labeled_image(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...)):
     answer = detect(model, server, cam_ip)
