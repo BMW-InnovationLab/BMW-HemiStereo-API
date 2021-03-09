@@ -10,14 +10,15 @@ import sys
 import datetime
 
 user = getpass.getuser()
-ppm_w = 14.4
-ppm_h = 20.75
-cx = 1023 / 2
-cy = 767 / 2
 h_sensor = 800
 w_sensor = 1024
+aspect_ratio = w_sensor / h_sensor
 fc1 = 1155.309825940708606140106
 theta_d_max = 1.74532925199432953355938
+
+afov_h = 180 * math.pi / 180
+afov_v = 140 * math.pi / 180
+
 field_of_view_h = 180
 field_of_view_v = 140
 
@@ -115,8 +116,8 @@ def detect(model, server, cam_ip):
                 for j in range(top, bottom):
                     if distance[j][i] < nearest_pixel and distance[j][i] != 0:
                         nearest_pixel = distance[j][i][0]
-                        textureness = 0.271 * (nearest_pixel / 10) + 9.52
-                        ctx.setProperty("stereo_textureness_filter_average_textureness", np.float32(textureness))
+                        # textureness = 0.271 * (nearest_pixel / 10) + 9.52
+                        # ctx.setProperty("stereo_textureness_filter_average_textureness", np.float32(textureness))
                     if distance[j][i] > far_pixel:
                         far_pixel = distance[j][i][0]
 
@@ -124,20 +125,25 @@ def detect(model, server, cam_ip):
             img = Image.fromarray(nump, 'RGB')
 
             depth = (far_pixel - nearest_pixel) / 10
+            print("field of view v: " + str(ctx.getProperty("stereo_matching_image_fov_v")))
 
             # Variable Distance Camera
-            height_px = bottom - top
-            print(height_px)
-            height_obj = nearest_pixel / 10 * (height_px / h_sensor) * fov_v_rad
+            # fov_v = 2 * (nearest_pixel / 10) * math.tan(afov_v/2)
 
+            height_px = bottom - top
+            height_obj = nearest_pixel / 10 * (height_px / h_sensor) * fov_v_rad
+            # height_obj = nearest_pixel / 10 * (height_px / h_sensor) * fov_v
+
+            # fov_h = 2 * (nearest_pixel / 10) * math.tan(afov_h/2)
             width_px = right - left
+            # width_obj = nearest_pixel / 10 * (width_px / w_sensor) * fov_h
             width_obj = nearest_pixel / 10 * (width_px / w_sensor) * fov_h_rad * 1.75
 
             img.save('images/labeled_image.png')
-            username = getpass.getuser()
-        #     if "labeled_images" not in os.listdir('/home/{}/Downloads/'.format(username)):
-        #         os.mkdir('/home/{}/Downloads/labeled_images'.format(username))
-        # img.save('/home/{}/Downloads/labeled_images/{}.png'.format(username, datetime.datetime.now()), 'PNG')
+
+        #     if "labeled_images" not in os.listdir('/home/{}/Downloads/'.format(user)):
+        #         os.mkdir('/home/{}/Downloads/labeled_images'.format(user))
+        # img.save('/home/{}/Downloads/labeled_images/{}.png'.format(user, datetime.datetime.now()), 'PNG')
     else:
         nearest_pixel = -1
 
@@ -154,6 +160,6 @@ def detect(model, server, cam_ip):
 
 def compute_threshold(cam_ip, model, server):
     distance, ctx = calculate_distance(model, server, cam_ip)
-    textureness = 0.271 * (distance/10) + 9.52
+    textureness = 0.271 * (distance / 10) + 9.52
     ctx.setProperty("stereo_textureness_filter_average_textureness", np.float32(textureness))
     return textureness
