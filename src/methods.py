@@ -8,38 +8,25 @@ import getpass
 from numpy import *
 import sys
 import datetime
+from scipy import ndimage
 
 user = getpass.getuser()
-h_sensor = 800
+h_sensor = 768
 w_sensor = 1024
-aspect_ratio = w_sensor / h_sensor
-fc1 = 1155.309825940708606140106
 theta_d_max = 1.74532925199432953355938
 
-afov_h = 180 * math.pi / 180
-afov_v = 140 * math.pi / 180
-
-field_of_view_h = 180
+field_of_view_h = 140
 field_of_view_v = 140
 
 fov_h_rad = field_of_view_h * math.pi / 180
 fov_v_rad = field_of_view_v * math.pi / 180
 
 
-# For Equiangular
-# fx = 1024 / fov_h_rad
-# fy = 768 / fov_v_rad
-
-# Intrinsic Matrix
-# K = array([[fx, 0, cx],
-#            [0, fy, cy],
-#            [0, 0, 1]])
-
-
 def single_shot(cam_ip):
     ctx = Context(appname="stereo", server=cam_ip, port="8888")
     ctx.setProperty("stereo_target_camera_enabled", bool(1))
-    ctx.setProperty("stereo_target_camera_model", 5)
+    # Set Camera Model to Pinhole
+    ctx.setProperty("stereo_target_camera_model", 4)
     msg = ctx.readTopic("image")
     np = unpackMessageToNumpy(msg.data)
     i = Image.fromarray(np)
@@ -48,12 +35,12 @@ def single_shot(cam_ip):
     return ctx
 
 
-def get_answer(model, server):
+def get_answer(model, server, image_path):
     buffer = BytesIO()
     c = pycurl.Curl()
     c.setopt(c.POST, 1)
     c.setopt(c.URL, server + "detect")
-    c.setopt(c.HTTPPOST, [("model", model), ("image", (c.FORM_FILE, "images/raw_image.png"))])
+    c.setopt(c.HTTPPOST, [("model", model), ("image", (c.FORM_FILE, image_path))])
     c.setopt(c.WRITEFUNCTION, buffer.write)
     c.perform()
     c.close()
@@ -66,7 +53,7 @@ def calculate_distance(model, server, cam_ip):
     ctx = single_shot(cam_ip)
     nearest_pixel = sys.maxsize
     print('Sending image to api with specified model')
-    answer = get_answer(model, server)
+    answer = get_answer(model, server, "images/raw_image.png")
     message = ctx.readTopic("distance")
     distance = unpackMessageToNumpy(message.data)
 
@@ -89,19 +76,23 @@ def calculate_distance(model, server, cam_ip):
 
 
 def detect(model, server, cam_ip):
+    # Calibrate Textureness Avg. Threshold
+    # threshold = compute_threshold(cam_ip, model, server)
+    # print(threshold)
+
+    # Detect Object
     ctx = single_shot(cam_ip)
     msg = ctx.readTopic("image")
     nump = unpackMessageToNumpy(msg.data)
     nearest_pixel = sys.maxsize
     far_pixel = 0
-    width = 0
-    height = 0
     depth = 0
-    distance = ctx.readTopic("distance")
     print('Sending image to api with specified model')
     answer = get_answer(model, server)
     message = ctx.readTopic("distance")
     distance = unpackMessageToNumpy(message.data)
+
+
 
     if len(answer["bounding-boxes"]) > 0:
         for box in range(len(answer['bounding-boxes'])):
@@ -116,11 +107,9 @@ def detect(model, server, cam_ip):
                 for j in range(top, bottom):
                     if distance[j][i] < nearest_pixel and distance[j][i] != 0:
                         nearest_pixel = distance[j][i][0]
-                        # textureness = 0.271 * (nearest_pixel / 10) + 9.52
-                        # ctx.setProperty("stereo_textureness_filter_average_textureness", np.float32(textureness))
                     if distance[j][i] > far_pixel:
                         far_pixel = distance[j][i][0]
-
+            # Draw Bounding Box
             cv2.rectangle(nump, (right, top), (left, bottom), (255, 0, 0), 2)
             img = Image.fromarray(nump, 'RGB')
 
@@ -128,16 +117,11 @@ def detect(model, server, cam_ip):
             print("field of view v: " + str(ctx.getProperty("stereo_matching_image_fov_v")))
 
             # Variable Distance Camera
-            # fov_v = 2 * (nearest_pixel / 10) * math.tan(afov_v/2)
-
             height_px = bottom - top
-            height_obj = nearest_pixel / 10 * (height_px / h_sensor) * fov_v_rad
-            # height_obj = nearest_pixel / 10 * (height_px / h_sensor) * fov_v
+            height_obj = nearest_pixel / 10 * (height_px / h_sensor) * math.tan(fov_v_rad / 2) * 2
 
-            # fov_h = 2 * (nearest_pixel / 10) * math.tan(afov_h/2)
             width_px = right - left
-            # width_obj = nearest_pixel / 10 * (width_px / w_sensor) * fov_h
-            width_obj = nearest_pixel / 10 * (width_px / w_sensor) * fov_h_rad * 1.75
+            width_obj = nearest_pixel / 10 * (width_px / w_sensor) * math.tan(fov_h_rad / 2) * 2
 
             img.save('images/labeled_image.png')
 
@@ -158,8 +142,76 @@ def detect(model, server, cam_ip):
     return answer
 
 
-def compute_threshold(cam_ip, model, server):
+def compute_threshold(cam_ip):
     distance, ctx = calculate_distance(model, server, cam_ip)
     textureness = 0.271 * (distance / 10) + 9.52
     ctx.setProperty("stereo_textureness_filter_average_textureness", np.float32(textureness))
     return textureness
+
+
+# Need to convert distance image into numpy array to calculate distance.
+def detect_object_image(image_path, model, server):
+    nearest_pixel = sys.maxsize
+    far_pixel = 0
+
+    # Read the image
+    img = Image.open(image_path)
+    data = asarray(img)
+    height, width, channel = data.shape
+
+    # Cut the image in half
+    width_cutoff = width // 2
+    s1 = data[:, :width_cutoff]
+    s2 = data[:, width_cutoff:]
+
+    # Save each half
+    raw = Image.fromarray(s1)
+    map = Image.fromarray(s2)
+    raw.save("images/raw_part.png")
+    map.save("images/distance_part.png")
+    answer = get_answer(model, server, "images/raw_part.png")
+
+    distance_img = Image.open("images/raw_part.png")
+    numpy_data = asarray(distance_img)
+    distance_array = ndimage.distance_transform_edt(numpy_data)
+
+    if len(answer["bounding-boxes"]) > 0:
+        for box in range(len(answer['bounding-boxes'])):
+            object_class_name = answer['bounding-boxes'][box]['ObjectClassName']
+            bounding_box = answer['bounding-boxes'][box]['coordinates']
+            bottom = bounding_box['bottom']
+            left = bounding_box['left']
+            right = bounding_box['right']
+            top = bounding_box['top']
+
+            for i in range(left, right):
+                for j in range(top, bottom):
+                    if distance_array[j][i][0] < nearest_pixel and distance_array[j][i][0] != 0:
+                        nearest_pixel = distance_array[j][i][0]
+                    if distance_array[j][i][0] > far_pixel:
+                        far_pixel = distance_array[j][i][0]
+        cv2.rectangle(numpy_data, (right, top), (left, bottom), (255, 0, 0), 2)
+        img = Image.fromarray(numpy_data, 'RGB')
+
+        depth = (far_pixel - nearest_pixel) / 10
+
+        # Variable Distance Camera
+        height_px = bottom - top
+        height_obj = nearest_pixel / 10 * (height_px / h_sensor) * math.tan(fov_v_rad / 2) * 2
+
+        width_px = right - left
+        width_obj = nearest_pixel / 10 * (width_px / w_sensor) * math.tan(fov_h_rad / 2) * 2
+
+        img.save('images/labeled_image.png')
+    else:
+        nearest_pixel = -1
+
+    if nearest_pixel > 0:
+        answer['bounding-boxes'][box]['dimensions'] = {"depth": depth, "width": float("{:.2f}".format(width_obj)),
+                                                       "height": float("{:.2f}".format(height_obj))}
+        answer['bounding-boxes'][box]['distance'] = float(nearest_pixel / 10)
+
+    else:
+        print("No objects labeled.")
+
+    return answer

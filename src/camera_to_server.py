@@ -1,9 +1,10 @@
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Form, UploadFile, File
 from fastapi.responses import FileResponse
 from starlette.responses import StreamingResponse
 import uvicorn
 from methods import *
 import io
+import shutil
 
 # model_name = "TestCam2-Training1"
 # server = "http://deeplearning06.muc:4344/"
@@ -16,9 +17,11 @@ app = FastAPI(title="Hemistereo API", description="<b>API for performing object 
                                                   "<b>")
 
 
+# Take Daniel's opinion about saving the numpy array of the distance map with the image to find the depth afterwards.
 @app.post("/single_shot")
 def see_raw_image(cam_ip: str = Form(...)):
     ctx = single_shot(cam_ip)
+    msg = ctx.readTopic("distance")
     # i.save('/home/{}/Downloads/images/{}.png'.format(user, datetime.datetime.now()))
     return FileResponse('images/raw_image.png')
 
@@ -42,7 +45,6 @@ def see_raw_image(model: str = Form(...), server: str = Form(...), cam_ip: str =
     # i.save('/home/{}/Downloads/images/{}.png'.format(user, datetime.datetime.now()))
     # return StreamingResponse(io.BytesIO(im_h.tobytes()), media_type="image/png")
     return FileResponse('images/raw+dist.png')
-    # , detect(model, server, cam_ip)
 
 
 @app.post("/set_threshold")
@@ -54,6 +56,15 @@ def set_threshold(cam_ip=Form(...), model=Form(...), server=Form(...)):
 def detect_object(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...)):
     # open('raw_image.png', server).write(r.content)
     return detect(model, server, cam_ip)
+
+
+# Needs fixing
+@app.post("/detect_input")
+def detect_object_from_input_image(image: UploadFile = File(...), model = Form(...), server = Form(...)):
+    with open("/home/maria/PycharmProjects/camera/src/images/test.png", "wb") as buffer:
+        shutil.copyfileobj(image.file, buffer)
+    print(buffer)
+    return detect_object_image("/home/maria/PycharmProjects/camera/src/images/test.png", model, server)
 
 
 @app.post("/detect/save_image")

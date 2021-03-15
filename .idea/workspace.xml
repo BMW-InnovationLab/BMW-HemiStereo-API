@@ -2,12 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c6ec6a84-3441-4f27-b921-5304ab71f614" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/docs/field_of_view.gif" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/max_disp.gif" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/textureness_threshold.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/images/distance_part.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/images/raw_part.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/images/test.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/docker/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/camera_to_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/camera_to_server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/images/distance_map.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/distance_map.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/images/labeled_image.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/labeled_image.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/images/raw+dist.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/raw+dist.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/images/raw_image.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/raw_image.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/methods.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/methods.py" afterDir="false" />
     </list>
@@ -46,7 +49,14 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="full.screen.before.presentation.mode" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/docs" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings is-module-sdk="true">
+        <option name="myUseModuleSdk" value="true" />
+      </console-settings>
+    </option>
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -208,6 +218,9 @@
     </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration>$USER_HOME$/.subversion</configuration>
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="c6ec6a84-3441-4f27-b921-5304ab71f614" name="Default Changelist" comment="" />
