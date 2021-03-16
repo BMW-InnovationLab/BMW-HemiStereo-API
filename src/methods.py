@@ -23,15 +23,30 @@ fov_v_rad = field_of_view_v * math.pi / 180
 
 
 def single_shot(cam_ip):
+    numpy.set_printoptions(threshold=sys.maxsize)
     ctx = Context(appname="stereo", server=cam_ip, port="8888")
     ctx.setProperty("stereo_target_camera_enabled", bool(1))
     # Set Camera Model to Pinhole
     ctx.setProperty("stereo_target_camera_model", 4)
     msg = ctx.readTopic("image")
+
+    msg1 = ctx.readTopic("distance")
+    distance = unpackMessageToNumpy(msg1.data)
+
+    print(distance.shape)
+    distance_str = ""
+    for i in range(0, len(distance)):
+        for j in range(0, len(distance[i])):
+            distance_str += str(distance[i][j][0])
+
+    f = open("distance.txt", "w")
+    f.write(distance_str)
+    f.close()
+
     np = unpackMessageToNumpy(msg.data)
     i = Image.fromarray(np)
     i.save('images/raw_image.png')
-    # i.save('/home/{}/Downloads/images/{}.png'.format(user, datetime.datetime.now()), 'PNG')
+    # i.save(path + '{}.png'.format(datetime.datetime.now()), 'PNG')
     return ctx
 
 
@@ -91,8 +106,6 @@ def detect(model, server, cam_ip):
     answer = get_answer(model, server)
     message = ctx.readTopic("distance")
     distance = unpackMessageToNumpy(message.data)
-
-
 
     if len(answer["bounding-boxes"]) > 0:
         for box in range(len(answer['bounding-boxes'])):
@@ -154,26 +167,12 @@ def detect_object_image(image_path, model, server):
     nearest_pixel = sys.maxsize
     far_pixel = 0
 
-    # Read the image
-    img = Image.open(image_path)
-    data = asarray(img)
-    height, width, channel = data.shape
+    answer = get_answer(model, server, image_path)
 
-    # Cut the image in half
-    width_cutoff = width // 2
-    s1 = data[:, :width_cutoff]
-    s2 = data[:, width_cutoff:]
-
-    # Save each half
-    raw = Image.fromarray(s1)
-    map = Image.fromarray(s2)
-    raw.save("images/raw_part.png")
-    map.save("images/distance_part.png")
-    answer = get_answer(model, server, "images/raw_part.png")
-
-    distance_img = Image.open("images/raw_part.png")
-    numpy_data = asarray(distance_img)
-    distance_array = ndimage.distance_transform_edt(numpy_data)
+    with open('distance.txt', 'r+') as file:
+        distance = file.read().rstrip()
+    distance_array = numpy.array(list(distance), dtype=numpy.uint16)
+    distance_array = numpy.reshape(distance_array, (800, 1024, 1))
 
     if len(answer["bounding-boxes"]) > 0:
         for box in range(len(answer['bounding-boxes'])):
@@ -183,7 +182,7 @@ def detect_object_image(image_path, model, server):
             left = bounding_box['left']
             right = bounding_box['right']
             top = bounding_box['top']
-
+    #
             for i in range(left, right):
                 for j in range(top, bottom):
                     if distance_array[j][i][0] < nearest_pixel and distance_array[j][i][0] != 0:
@@ -191,27 +190,27 @@ def detect_object_image(image_path, model, server):
                     if distance_array[j][i][0] > far_pixel:
                         far_pixel = distance_array[j][i][0]
         cv2.rectangle(numpy_data, (right, top), (left, bottom), (255, 0, 0), 2)
-        img = Image.fromarray(numpy_data, 'RGB')
-
-        depth = (far_pixel - nearest_pixel) / 10
-
-        # Variable Distance Camera
-        height_px = bottom - top
-        height_obj = nearest_pixel / 10 * (height_px / h_sensor) * math.tan(fov_v_rad / 2) * 2
-
-        width_px = right - left
-        width_obj = nearest_pixel / 10 * (width_px / w_sensor) * math.tan(fov_h_rad / 2) * 2
-
-        img.save('images/labeled_image.png')
-    else:
-        nearest_pixel = -1
-
-    if nearest_pixel > 0:
-        answer['bounding-boxes'][box]['dimensions'] = {"depth": depth, "width": float("{:.2f}".format(width_obj)),
-                                                       "height": float("{:.2f}".format(height_obj))}
-        answer['bounding-boxes'][box]['distance'] = float(nearest_pixel / 10)
-
-    else:
-        print("No objects labeled.")
-
-    return answer
+    #     img = Image.fromarray(numpy_data, 'RGB')
+    #
+    #     depth = (far_pixel - nearest_pixel) / 10
+    #
+    #     # Variable Distance Camera
+    #     height_px = bottom - top
+    #     height_obj = nearest_pixel / 10 * (height_px / h_sensor) * math.tan(fov_v_rad / 2) * 2
+    #
+    #     width_px = right - left
+    #     width_obj = nearest_pixel / 10 * (width_px / w_sensor) * math.tan(fov_h_rad / 2) * 2
+    #
+    #     img.save('images/labeled_image.png')
+    # else:
+    #     nearest_pixel = -1
+    #
+    # if nearest_pixel > 0:
+    #     answer['bounding-boxes'][box]['dimensions'] = {"depth": depth, "width": float("{:.2f}".format(width_obj)),
+    #                                                    "height": float("{:.2f}".format(height_obj))}
+    #     answer['bounding-boxes'][box]['distance'] = float(nearest_pixel / 10)
+    #
+    # else:
+    #     print("No objects labeled.")
+    #
+    # return answer

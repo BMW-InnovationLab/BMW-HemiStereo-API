@@ -1,0 +1,546 @@
+properties {
+  key: "distance_enabled"
+  value {
+    prop_bool {
+      value: true
+    }
+  }
+}
+properties {
+  key: "pointcloud_enabled"
+  value {
+    prop_bool {
+      value: true
+    }
+  }
+}
+properties {
+  key: "raw_image_output_enabled"
+  value {
+    prop_bool {
+    }
+  }
+}
+properties {
+  key: "source_camera_camera_mode"
+  value {
+    prop_uint64 {
+      max: 2
+    }
+    displayname: "Sensor mode"
+    description: "The mode of the image sensor."
+  }
+}
+properties {
+  key: "source_camera_digital_gain_max"
+  value {
+    prop_float {
+      value: 1.0
+      min: 1.0
+      max: 256.0
+    }
+    displayname: "Digital gain max."
+    description: "The maximum digital gain value."
+  }
+}
+properties {
+  key: "source_camera_digital_gain_min"
+  value {
+    prop_float {
+      value: 1.0
+      min: 1.0
+      max: 256.0
+    }
+    displayname: "Digital gain min."
+    description: "The minimum digital gain value."
+  }
+}
+properties {
+  key: "source_camera_edge_enhance_strength"
+  value {
+    prop_float {
+      value: 0.5
+      min: -3.4028234663852886e+38
+      max: 3.4028234663852886e+38
+    }
+    displayname: "Edge enhance strength"
+    description: "The strength of the edge enhancement filter."
+  }
+}
+properties {
+  key: "source_camera_exposure_compensation"
+  value {
+    prop_float {
+      min: -3.4028234663852886e+38
+      max: 3.4028234663852886e+38
+    }
+    displayname: "Exposure compensation"
+    description: "The exposure compensation."
+  }
+}
+properties {
+  key: "source_camera_exposure_lock"
+  value {
+    prop_bool {
+    }
+    displayname: "Exposure lock"
+    description: "Locks/unlocks the current exposure settings."
+  }
+}
+properties {
+  key: "source_camera_exposure_max"
+  value {
+    prop_uint64 {
+      value: 683708
+      min: 13
+      max: 683709
+    }
+    displayname: "Exposure max."
+    description: "The maximum exposure time in microseconds."
+  }
+}
+properties {
+  key: "source_camera_exposure_min"
+  value {
+    prop_uint64 {
+      value: 13
+      min: 13
+      max: 683709
+    }
+    displayname: "Exposure min."
+    description: "The minimum exposure time in microseconds."
+  }
+}
+properties {
+  key: "source_camera_frame_rate"
+  value {
+    prop_float {
+      value: 12.0
+      min: 0.9999989867210388
+      max: 28.000001907348633
+    }
+    displayname: "Frame rate"
+    description: "The frame rate of the image sensors."
+  }
+}
+properties {
+  key: "source_camera_gain_max"
+  value {
+    prop_float {
+      value: 22.25
+      min: 1.0
+      max: 22.25
+    }
+    displayname: "Gain max."
+    description: "The maximum analog gain value."
+  }
+}
+properties {
+  key: "source_camera_gain_min"
+  value {
+    prop_float {
+      value: 1.0
+      min: 1.0
+      max: 22.25
+    }
+    displayname: "Gain min."
+    description: "The minimum analog gain value."
+  }
+}
+properties {
+  key: "source_record_dir"
+  value {
+    prop_string {
+    }
+    displayname: "Record Directory"
+    description: "Directory containing images for replay and calibration data"
+  }
+}
+properties {
+  key: "source_source"
+  value {
+    prop_enum {
+      value_map {
+        key: 0
+        value: "Camera"
+      }
+      value_map {
+        key: 1
+        value: "Record Directory"
+      }
+    }
+    displayname: "Image Source"
+    description: "Selects the source from which to capture images"
+  }
+}
+properties {
+  key: "stereo_matcher_type"
+  value {
+    prop_enum {
+      value_map {
+        key: 0
+        value: "Semi-Global Matching"
+      }
+      value_map {
+        key: 1
+        value: "Block Matching"
+      }
+      value_map {
+        key: 2
+        value: "Deep Neural Network"
+      }
+    }
+    displayname: "Stereo matching type"
+    description: "The algorithm used for stereo matching."
+  }
+}
+properties {
+  key: "stereo_matching_image_fov_h"
+  value {
+    prop_float {
+      value: 140.0
+      min: 10.0
+      max: 180.0
+    }
+    displayname: "Horizontal matching fov"
+    description: "The horizontal field of view of the rectified image."
+  }
+}
+properties {
+  key: "stereo_matching_image_fov_v"
+  value {
+    prop_float {
+      value: 140.0
+      min: 10.0
+      max: 180.0
+    }
+    displayname: "Vertical matching fov"
+    description: "The vertical field of view of the rectified image."
+  }
+}
+properties {
+  key: "stereo_matching_image_height"
+  value {
+    prop_uint64 {
+      value: 1024
+      min: 128
+      max: 4096
+    }
+    displayname: "Stereo matching height"
+    description: "The height of the rectified image used for stereo matching."
+  }
+}
+properties {
+  key: "stereo_matching_image_width"
+  value {
+    prop_uint64 {
+      value: 800
+      min: 128
+      max: 4096
+      step: 4
+    }
+    displayname: "Stereo matching width"
+    description: "The width of the rectified image used for stereo matching."
+  }
+}
+properties {
+  key: "stereo_sgm_ct_win_size"
+  value {
+    prop_int32 {
+      value: 3
+      min: -1
+      max: 31
+      step: 2
+    }
+    displayname: "Census window size"
+    description: "Specifies the census transform window size. Set to -1 to disable."
+  }
+}
+properties {
+  key: "stereo_sgm_filter_top_area"
+  value {
+    prop_bool {
+    }
+    displayname: "Filter low gradients"
+    description: "Filter cost at top image area with low gradients."
+  }
+}
+properties {
+  key: "stereo_sgm_hc_win_size"
+  value {
+    prop_int32 {
+      value: 5
+      min: -1
+      max: 31
+      step: 2
+    }
+    displayname: "Hamming window size"
+    description: "Specifies the hamming cost window size. Set to -1 to disable."
+  }
+}
+properties {
+  key: "stereo_sgm_max_diff"
+  value {
+    prop_int32 {
+      value: 5
+      max: 2147483647
+    }
+    displayname: "Max. diff l/r check"
+    description: "Maximum allowed difference (in integer pixel units) in the left-right disparity check."
+  }
+}
+properties {
+  key: "stereo_sgm_max_disparity"
+  value {
+    prop_int32 {
+      value: 128
+      min: 16
+      max: 256
+      step: 4
+    }
+    displayname: "Max. disparity"
+    description: "The maximum disparity value."
+  }
+}
+properties {
+  key: "stereo_sgm_p1"
+  value {
+    prop_int32 {
+      value: 8
+      max: 2147483647
+    }
+    displayname: "P1"
+    description: "Smoothness penalty."
+  }
+}
+properties {
+  key: "stereo_sgm_p2"
+  value {
+    prop_int32 {
+      value: 32
+      max: 2147483647
+    }
+    displayname: "P2"
+    description: "Discontiguous penalty."
+  }
+}
+properties {
+  key: "stereo_sgm_pyramidal_stereo"
+  value {
+    prop_bool {
+      value: true
+    }
+    displayname: "Pyramidal"
+    description: "Use pyramidal scheme: lower resolution imagery for nearby objects and the full resolution for far-away objects."
+  }
+}
+properties {
+  key: "stereo_sgm_sad"
+  value {
+    prop_int32 {
+      value: 3
+      min: 1
+      max: 31
+      step: 2
+    }
+    displayname: "SAD window size"
+    description: "Specifies the average window size for sum of absolute differences. Set to 1 for original SGM."
+  }
+}
+properties {
+  key: "stereo_sgm_scan_lines"
+  value {
+    prop_enum {
+      value: 255
+      value_map {
+        key: 85
+        value: "Cross"
+      }
+      value_map {
+        key: 255
+        value: "All"
+      }
+    }
+    displayname: "Scanlines"
+    description: "Scan line directions."
+  }
+}
+properties {
+  key: "stereo_sgm_uniqueness"
+  value {
+    prop_int32 {
+      value: 15
+      max: 2147483647
+    }
+    displayname: "Uniqueness"
+    description: "Margin in percentage by which the best (minimum) computed cost function value should \342\200\234win\342\200\235 the second best value to consider the found match correct. "
+  }
+}
+properties {
+  key: "stereo_target_camera_enabled"
+  value {
+    prop_bool {
+      value: true
+    }
+    displayname: "Target camera"
+    description: "If enabled, the images will be converted to a configurable camera model."
+  }
+}
+properties {
+  key: "stereo_target_camera_model"
+  value {
+    prop_enum {
+      value: 4
+      value_map {
+        key: 1
+        value: "Equiangular"
+      }
+      value_map {
+        key: 4
+        value: "Pinhole"
+      }
+      value_map {
+        key: 5
+        value: "Equirectangular"
+      }
+    }
+    displayname: "Target projection model"
+    description: "The projection model of the target image."
+  }
+}
+properties {
+  key: "stereo_target_image_fov_h"
+  value {
+    prop_float {
+      value: 140.0
+      min: 10.0
+      max: 180.0
+    }
+    displayname: "Target horizontal fov"
+    description: "The horizontal field of view of the target image."
+  }
+}
+properties {
+  key: "stereo_target_image_fov_v"
+  value {
+    prop_float {
+      value: 140.0
+      min: 10.0
+      max: 180.0
+    }
+    displayname: "Target vertical fov"
+    description: "The vertical field of view of the target image."
+  }
+}
+properties {
+  key: "stereo_target_image_height"
+  value {
+    prop_uint64 {
+      value: 800
+      min: 128
+      max: 4096
+    }
+    displayname: "Target image width"
+    description: "The height of the target image."
+  }
+}
+properties {
+  key: "stereo_target_image_width"
+  value {
+    prop_uint64 {
+      value: 1024
+      min: 128
+      max: 4096
+    }
+    displayname: "Target image width"
+    description: "The width of the target image."
+  }
+}
+properties {
+  key: "stereo_textureness_filter_average_textureness"
+  value {
+    prop_float {
+      value: 17.0
+      max: 3.4028234663852886e+38
+    }
+    displayname: "Min. avg. textureness"
+    description: "The minimum average textureness inside the the filter window."
+  }
+}
+properties {
+  key: "stereo_textureness_filter_enabled"
+  value {
+    prop_bool {
+      value: true
+    }
+    displayname: "Textureness filter"
+    description: "Enables/disables the textureness filter."
+  }
+}
+properties {
+  key: "stereo_textureness_filter_win_size"
+  value {
+    prop_int32 {
+      value: 5
+      min: 1
+      max: 61
+      step: 2
+    }
+    displayname: "Window size"
+    description: "The size of the window used for texture analysis."
+  }
+}
+outputs {
+  key: "calib_orig_0"
+  value {
+    type: "hs::calib::Camera"
+  }
+}
+outputs {
+  key: "calib_orig_1"
+  value {
+    type: "hs::calib::Camera"
+  }
+}
+outputs {
+  key: "distance"
+  value {
+    type: "hs::types::Matrix<uint16, 1>"
+  }
+}
+outputs {
+  key: "fps"
+  value {
+    type: "float"
+  }
+}
+outputs {
+  key: "image"
+  value {
+    type: "hs::types::Matrix<uint8, 3>"
+  }
+}
+outputs {
+  key: "image_rect_0"
+  value {
+    type: "hs::types::Matrix<uint8, 3>"
+  }
+}
+outputs {
+  key: "image_rect_1"
+  value {
+    type: "hs::types::Matrix<uint8, 3>"
+  }
+}
+outputs {
+  key: "pointcloud"
+  value {
+    type: "hs::types::Matrix<hs::types::Point3d<float>, 1>"
+  }
+}
+outputs {
+  key: "stereo_frame"
+  value {
+    type: "hs::MessageMap"
+  }
+}
