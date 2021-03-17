@@ -5,6 +5,10 @@ import uvicorn
 from methods import *
 import io
 import shutil
+import getpass
+from watcher import *
+import threading
+import time
 
 # model_name = "TestCam2-Training1"
 # server = "http://deeplearning06.muc:4344/"
@@ -17,11 +21,22 @@ app = FastAPI(title="Hemistereo API", description="<b>API for performing object 
                                                   "<b>")
 
 
-# Take Daniel's opinion about saving the numpy array of the distance map with the image to find the depth afterwards.
+def watch():
+    w = Watcher()
+    time.sleep(2)
+    w.run("/home/maria/Downloads/labeled_images")
+
+
+def uvicorn_run():
+    time.sleep(2)
+    uvicorn.run("camera_to_server:app", reload=True)
+
+
 @app.post("/single_shot")
 def see_raw_image(cam_ip: str = Form(...)):
     ctx = single_shot(cam_ip)
     msg = ctx.readTopic("distance")
+
     # i.save('/home/{}/Downloads/images/{}.png'.format(user, datetime.datetime.now()))
     return FileResponse('images/raw_image.png')
 
@@ -60,11 +75,10 @@ def detect_object(model: str = Form(...), server: str = Form(...), cam_ip: str =
 
 # Needs fixing
 @app.post("/detect_input")
-def detect_object_from_input_image(image: UploadFile = File(...), model = Form(...), server = Form(...)):
-    with open("/home/maria/PycharmProjects/camera/src/images/test.png", "wb") as buffer:
+def detect_object_from_input_image(image: UploadFile = File(...), model=Form(...), server=Form(...)):
+    with open("images/test.png", "wb") as buffer:
         shutil.copyfileobj(image.file, buffer)
-    print(buffer)
-    return detect_object_image("/home/maria/PycharmProjects/camera/src/images/test.png", model, server)
+    return detect_object_image("images/test.png", model, server)
 
 
 @app.post("/detect/save_image")
@@ -76,5 +90,12 @@ def save_labeled_image(model: str = Form(...), server: str = Form(...), cam_ip: 
         return StreamingResponse(io.BytesIO(b), media_type="image/png")
 
 
+# To be fixed
 if __name__ == '__main__':
-    uvicorn.run("camera_to_server:app", reload=True)
+    t1 = threading.Thread(target=watch, )
+    t2 = threading.Thread(target=uvicorn_run, )
+
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()
