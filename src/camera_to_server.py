@@ -24,7 +24,7 @@ app = FastAPI(title="Hemistereo API", description="<b>API for performing object 
 def watch():
     w = Watcher()
     time.sleep(2)
-    w.run("/home/maria/Downloads/labeled_images")
+    w.run("/home/maria/Downloads/images")
 
 
 @app.post("/single_shot")

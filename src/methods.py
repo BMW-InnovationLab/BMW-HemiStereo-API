@@ -9,6 +9,7 @@ from numpy import *
 import sys
 import datetime
 import json
+from scipy import sparse
 
 user = getpass.getuser()
 h_sensor = 768
@@ -33,11 +34,14 @@ def single_shot(cam_ip, path):
     msg = ctx.readTopic("image")
 
     msg1 = ctx.readTopic("distance")
-    # 3D distance map
-    distance = unpackMessageToNumpy(msg1.data).tolist()
+    # 3D distance map to list
+    # distance = unpackMessageToNumpy(msg1.data).tolist()
+    # Unpacking distance map to numpy array
+    distance = unpackMessageToNumpy(msg1.data)
     # Reshaping the distance map to 2D
-    # distance_reshaped = distance.reshape(distance.shape[0], -1)
-
+    distance_reshaped = distance.reshape(distance.shape[0], -1)
+    # 2D distance map to sparse matrix
+    distance_sparse = sparse.csr_matrix(distance_reshaped)
     # Saving reshaped map to txt file
     # numpy.savetxt("distance.txt", distance_reshaped)
 
@@ -51,8 +55,8 @@ def single_shot(cam_ip, path):
         arr = image_path.split('/')
     else:
         arr = image_path.split('\\')
-
-    data.append({'name': arr[-1], 'distance_map': distance})
+    data.append({'name': arr[-1], 'distance_map': distance_sparse.tolil().tolist()})
+    print(distance_sparse)
     with open('data.json', 'w') as outfile:
         json.dump(data, outfile)
     return ctx
@@ -99,7 +103,6 @@ def calculate_distance(model, server, cam_ip):
 
 
 def detect(model, server, cam_ip):
-
     # Detect Object
     ctx = single_shot(cam_ip)
     msg = ctx.readTopic("image")
