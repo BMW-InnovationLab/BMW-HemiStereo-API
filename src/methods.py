@@ -8,6 +8,7 @@ import getpass
 from numpy import *
 import sys
 import datetime
+import json
 
 user = getpass.getuser()
 h_sensor = 768
@@ -20,8 +21,10 @@ field_of_view_v = 140
 fov_h_rad = field_of_view_h * math.pi / 180
 fov_v_rad = field_of_view_v * math.pi / 180
 
+data = []
 
-def single_shot(cam_ip):
+
+def single_shot(cam_ip, path):
     numpy.set_printoptions(threshold=sys.maxsize)
     ctx = Context(appname="stereo", server=cam_ip, port="8888")
     ctx.setProperty("stereo_target_camera_enabled", bool(1))
@@ -31,17 +34,27 @@ def single_shot(cam_ip):
 
     msg1 = ctx.readTopic("distance")
     # 3D distance map
-    distance = unpackMessageToNumpy(msg1.data)
+    distance = unpackMessageToNumpy(msg1.data).tolist()
     # Reshaping the distance map to 2D
-    distance_reshaped = distance.reshape(distance.shape[0], -1)
+    # distance_reshaped = distance.reshape(distance.shape[0], -1)
 
     # Saving reshaped map to txt file
-    numpy.savetxt("distance.txt", distance_reshaped)
+    # numpy.savetxt("distance.txt", distance_reshaped)
 
     np = unpackMessageToNumpy(msg.data)
     i = Image.fromarray(np)
     i.save('images/raw_image.png')
-    # i.save(path + '{}.png'.format(datetime.datetime.now()), 'PNG')
+    image_path = path + '{}.png'.format(datetime.datetime.now())
+    i.save(image_path, 'PNG')
+
+    if image_path[0] == "/":
+        arr = image_path.split('/')
+    else:
+        arr = image_path.split('\\')
+
+    data.append({'name': arr[-1], 'distance_map': distance})
+    with open('data.json', 'w') as outfile:
+        json.dump(data, outfile)
     return ctx
 
 

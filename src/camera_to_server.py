@@ -27,37 +27,26 @@ def watch():
     w.run("/home/maria/Downloads/labeled_images")
 
 
-def uvicorn_run():
-    time.sleep(2)
-    uvicorn.run("camera_to_server:app", reload=True)
-
-
 @app.post("/single_shot")
-def see_raw_image(cam_ip: str = Form(...)):
-    ctx = single_shot(cam_ip)
+def see_raw_image(cam_ip: str = Form(...), path: str = Form(...)):
+    ctx = single_shot(cam_ip, path)
     msg = ctx.readTopic("distance")
-
     # i.save('/home/{}/Downloads/images/{}.png'.format(user, datetime.datetime.now()))
     return FileResponse('images/raw_image.png')
 
 
 @app.post("/single_shot/distance_map")
-def see_raw_image(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...)):
-    ctx = single_shot(cam_ip)
+def see_raw_image(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...), path: str = Form(...)):
+    ctx = single_shot(cam_ip, path)
     msg = ctx.readTopic("distance")
     rgb = unpackMessageToNumpy(msg.data)
     rgb = formatNumpyToRGB(rgb)
     i = Image.fromarray(rgb)
     i.save('images/distance_map.png')
-    # with open("images/raw_image.png", "rb") as im1:
-    #     b1 = bytearray(im1.read())
-    # with open("images/distance_map.png", "rb") as im2:
-    #     b2 = bytearray(im2.read())
     im1 = cv2.imread('images/raw_image.png')
     im2 = cv2.imread('images/distance_map.png')
     im_h = cv2.hconcat([im1, im2])
     cv2.imwrite('images/raw+dist.png', im_h)
-    # i.save('/home/{}/Downloads/images/{}.png'.format(user, datetime.datetime.now()))
     # return StreamingResponse(io.BytesIO(im_h.tobytes()), media_type="image/png")
     return FileResponse('images/raw+dist.png')
 
@@ -90,12 +79,7 @@ def save_labeled_image(model: str = Form(...), server: str = Form(...), cam_ip: 
         return StreamingResponse(io.BytesIO(b), media_type="image/png")
 
 
-# To be fixed
 if __name__ == '__main__':
-    t1 = threading.Thread(target=watch, )
-    t2 = threading.Thread(target=uvicorn_run, )
-
+    t1 = threading.Thread(target=watch)
     t1.start()
-    t2.start()
-    t1.join()
-    t2.join()
+    uvicorn.run("camera_to_server:app", reload=True)

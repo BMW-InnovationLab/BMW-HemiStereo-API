@@ -2,15 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c6ec6a84-3441-4f27-b921-5304ab71f614" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/watcher.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/camera_to_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/camera_to_server.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/context.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/distance.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/images/labeled_image.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/labeled_image.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/images/raw_image.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/raw_image.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/images/test.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/test.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/methods.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/methods.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/watcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/watcher.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,7 +66,7 @@
       <recent name="$PROJECT_DIR$/resources/images" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.test">
+  <component name="RunManager" selected="Python.camera_to_server (1)">
     <configuration name="camera_to_server (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -207,9 +203,9 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.test" />
         <item itemvalue="Python.camera_to_server (1)" />
         <item itemvalue="Python.watcher" />
+        <item itemvalue="Python.test" />
         <item itemvalue="Python.methods" />
         <item itemvalue="Python.camera_to_server" />
       </list>
