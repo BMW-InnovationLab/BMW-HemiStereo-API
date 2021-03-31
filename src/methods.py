@@ -25,25 +25,32 @@ fov_v_rad = field_of_view_v * math.pi / 180
 data = []
 
 
-def single_shot(cam_ip, path):
+def get_image_name(image_path):
+    if image_path[0] == "/":
+        arr = image_path.split('/')
+    else:
+        arr = image_path.split('\\')
+    return arr[-1]
+
+
+def single_shot_save(cam_ip, path):
     numpy.set_printoptions(threshold=sys.maxsize)
     ctx = Context(appname="stereo", server=cam_ip, port="8888")
     ctx.setProperty("stereo_target_camera_enabled", bool(1))
+
     # Set Camera Model to Pinhole
     ctx.setProperty("stereo_target_camera_model", 4)
     msg = ctx.readTopic("image")
 
     msg1 = ctx.readTopic("distance")
     # 3D distance map to list
-    # distance = unpackMessageToNumpy(msg1.data).tolist()
+    distance = unpackMessageToNumpy(msg1.data).tolist()
     # Unpacking distance map to numpy array
-    distance = unpackMessageToNumpy(msg1.data)
+    # distance = unpackMessageToNumpy(msg1.data)
     # Reshaping the distance map to 2D
-    distance_reshaped = distance.reshape(distance.shape[0], -1)
+    # distance_reshaped = distance.reshape(distance.shape[0], -1)
     # 2D distance map to sparse matrix
-    distance_sparse = sparse.csr_matrix(distance_reshaped)
-    # Saving reshaped map to txt file
-    # numpy.savetxt("distance.txt", distance_reshaped)
+    # distance_sparse = sparse.csr_matrix(distance_reshaped)
 
     np = unpackMessageToNumpy(msg.data)
     i = Image.fromarray(np)
@@ -51,14 +58,26 @@ def single_shot(cam_ip, path):
     image_path = path + '{}.png'.format(datetime.datetime.now())
     i.save(image_path, 'PNG')
 
-    if image_path[0] == "/":
-        arr = image_path.split('/')
-    else:
-        arr = image_path.split('\\')
-    data.append({'name': arr[-1], 'distance_map': distance_sparse.tolil().tolist()})
-    print(distance_sparse)
+    data.append({'name': get_image_name(image_path), 'distance_map': distance})
     with open('data.json', 'w') as outfile:
         json.dump(data, outfile)
+    return ctx
+
+
+def single_shot(cam_ip):
+    numpy.set_printoptions(threshold=sys.maxsize)
+    ctx = Context(appname="stereo", server=cam_ip, port="8888")
+    ctx.setProperty("stereo_target_camera_enabled", bool(1))
+
+    # Set Camera Model to Pinhole
+    ctx.setProperty("stereo_target_camera_model", 4)
+    msg = ctx.readTopic("image")
+
+    msg1 = ctx.readTopic("distance")
+    distance = unpackMessageToNumpy(msg1.data)
+    np = unpackMessageToNumpy(msg.data)
+    i = Image.fromarray(np)
+    i.save('images/raw_image.png')
     return ctx
 
 
@@ -111,7 +130,7 @@ def detect(model, server, cam_ip):
     far_pixel = 0
     depth = 0
     print('Sending image to api with specified model')
-    answer = get_answer(model, server)
+    answer = get_answer(model, server, 'images/raw_image.png')
     message = ctx.readTopic("distance")
     distance = unpackMessageToNumpy(message.data)
 
@@ -148,7 +167,7 @@ def detect(model, server, cam_ip):
 
         #     if "labeled_images" not in os.listdir('/home/{}/Downloads/'.format(user)):
         #         os.mkdir('/home/{}/Downloads/labeled_images'.format(user))
-        # img.save('/home/{}/Downloads/labeled_images/{}.png'.format(user, datetime.datetime.now()), 'PNG')
+        # img.save(path + '{}.png'.format(datetime.datetime.now()), 'PNG')
     else:
         nearest_pixel = -1
 
@@ -170,24 +189,31 @@ def compute_threshold(cam_ip):
     return textureness
 
 
-def detect_object_image(image_path, model, server):
+def detect_object_image(image_name, model, server):
     nearest_pixel = sys.maxsize
     far_pixel = 0
 
-    answer = get_answer(model, server, image_path)
+    answer = get_answer(model, server, "images/test.png")
 
     image = Image.open("images/test.png")
     # Convert img to numpy array
     numpy_data = asarray(image)
 
-    # Retrieving data from file
-    loaded_distance = numpy.loadtxt("distance.txt")
+    loaded_distance = []
 
-    # This loaded distance array is a 2D array, therefore
-    # we need to convert it to the original
-    # array shape.reshaping to get original
-    # matrix with original shape.
-    load_original_distance = loaded_distance.reshape(loaded_distance.shape[0], loaded_distance.shape[1], 1)
+    # Retrieving data from file
+    with open('data.json', 'r') as outfile:
+        read_list = json.load(outfile)
+        for element in read_list:
+            if element['name'] == image_name:
+                loaded_distance = element['distance_map']
+
+    # This loaded distance array is a list, therefore
+    # we need to convert it to a numpy array
+    if len(loaded_distance) != 0:
+        load_numpy_distance = numpy.array(loaded_distance)
+        print(load_numpy_distance)
+        load_numpy_distance = load_numpy_distance.reshape(load_numpy_distance.shape[0], load_numpy_distance.shape[1], 1)
 
     if len(answer["bounding-boxes"]) > 0:
         for box in range(len(answer['bounding-boxes'])):
@@ -197,13 +223,14 @@ def detect_object_image(image_path, model, server):
             left = bounding_box['left']
             right = bounding_box['right']
             top = bounding_box['top']
-            #
+
             for i in range(left, right):
                 for j in range(top, bottom):
-                    if load_original_distance[j][i][0] < nearest_pixel and load_original_distance[j][i][0] != 0:
-                        nearest_pixel = load_original_distance[j][i][0]
-                    if load_original_distance[j][i][0] > far_pixel:
-                        far_pixel = load_original_distance[j][i][0]
+                    if load_numpy_distance[j][i][0] < nearest_pixel and load_numpy_distance[j][i][0] != 0:
+                        nearest_pixel = load_numpy_distance[j][i][0]
+                    if load_numpy_distance[j][i][0] > far_pixel:
+                        far_pixel = load_numpy_distance[j][i][0]
+
         cv2.rectangle(numpy_data, (right, top), (left, bottom), (255, 0, 0), 2)
         img = Image.fromarray(numpy_data, 'RGB')
 

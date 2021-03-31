@@ -29,7 +29,7 @@ def watch():
 
 @app.post("/single_shot")
 def see_raw_image(cam_ip: str = Form(...), path: str = Form(...)):
-    ctx = single_shot(cam_ip, path)
+    ctx = single_shot_save(cam_ip, path)
     msg = ctx.readTopic("distance")
     # i.save('/home/{}/Downloads/images/{}.png'.format(user, datetime.datetime.now()))
     return FileResponse('images/raw_image.png')
@@ -67,15 +67,17 @@ def detect_object(model: str = Form(...), server: str = Form(...), cam_ip: str =
 def detect_object_from_input_image(image: UploadFile = File(...), model=Form(...), server=Form(...)):
     with open("images/test.png", "wb") as buffer:
         shutil.copyfileobj(image.file, buffer)
-    return detect_object_image("images/test.png", model, server)
+    return detect_object_image(image.filename, model, server)
 
 
 @app.post("/detect/save_image")
-def save_labeled_image(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...)):
+def save_labeled_image(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...), path: str = Form(...)):
     answer = detect(model, server, cam_ip)
     if len(answer["bounding-boxes"]) > 0:
         with open("images/labeled_image.png", "rb") as f:
             b = bytearray(f.read())
+            img = Image.open("images/labeled_image.png")
+            img.save(path + '{}.png'.format(datetime.datetime.now()), 'PNG')
         return StreamingResponse(io.BytesIO(b), media_type="image/png")
 
 
