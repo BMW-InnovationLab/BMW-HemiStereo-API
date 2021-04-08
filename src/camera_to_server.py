@@ -24,15 +24,27 @@ app = FastAPI(title="Hemistereo API", description="<b>API for performing object 
 def watch():
     w = Watcher()
     time.sleep(2)
-    w.run("/home/maria/Downloads/images")
+    # w.run("/home/maria/Downloads/images")
+    w.run("raw_images")
 
 
 @app.post("/single_shot")
-def see_raw_image(cam_ip: str = Form(...), path: str = Form(...)):
-    ctx = single_shot_save(cam_ip, path)
+def see_raw_image(cam_ip: str = Form(...)):
+    ctx = single_shot_save(cam_ip)
+    im = ctx.readTopic("image")
+    np = unpackMessageToNumpy(im.data)
     msg = ctx.readTopic("distance")
+    # 3D distance map to list
+    distance = unpackMessageToNumpy(msg.data).tolist()
+
+    image_path = "raw_images/{}.png".format(datetime.datetime.now())
+    i = Image.fromarray(np)
+    i.save(image_path, 'PNG')
+    data.append({'name': get_image_name(image_path), 'distance_map': distance})
+    with open('data.json', 'w') as outfile:
+        json.dump(data, outfile)
     # i.save('/home/{}/Downloads/images/{}.png'.format(user, datetime.datetime.now()))
-    return FileResponse('images/raw_image.png')
+    return FileResponse(image_path)
 
 
 @app.post("/single_shot/distance_map")
@@ -62,7 +74,6 @@ def detect_object(model: str = Form(...), server: str = Form(...), cam_ip: str =
     return detect(model, server, cam_ip)
 
 
-# Needs fixing
 @app.post("/detect_input")
 def detect_object_from_input_image(image: UploadFile = File(...), model=Form(...), server=Form(...)):
     with open("images/test.png", "wb") as buffer:
@@ -71,13 +82,13 @@ def detect_object_from_input_image(image: UploadFile = File(...), model=Form(...
 
 
 @app.post("/detect/save_image")
-def save_labeled_image(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...), path: str = Form(...)):
+def save_labeled_image(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...)):
     answer = detect(model, server, cam_ip)
     if len(answer["bounding-boxes"]) > 0:
         with open("images/labeled_image.png", "rb") as f:
             b = bytearray(f.read())
             img = Image.open("images/labeled_image.png")
-            img.save(path + '{}.png'.format(datetime.datetime.now()), 'PNG')
+            img.save('labeled_images/{}.png'.format(datetime.datetime.now()), 'PNG')
         return StreamingResponse(io.BytesIO(b), media_type="image/png")
 
 

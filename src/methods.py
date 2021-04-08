@@ -33,7 +33,7 @@ def get_image_name(image_path):
     return arr[-1]
 
 
-def single_shot_save(cam_ip, path):
+def single_shot_save(cam_ip):
     numpy.set_printoptions(threshold=sys.maxsize)
     ctx = Context(appname="stereo", server=cam_ip, port="8888")
     ctx.setProperty("stereo_target_camera_enabled", bool(1))
@@ -41,10 +41,6 @@ def single_shot_save(cam_ip, path):
     # Set Camera Model to Pinhole
     ctx.setProperty("stereo_target_camera_model", 4)
     msg = ctx.readTopic("image")
-
-    msg1 = ctx.readTopic("distance")
-    # 3D distance map to list
-    distance = unpackMessageToNumpy(msg1.data).tolist()
     # Unpacking distance map to numpy array
     # distance = unpackMessageToNumpy(msg1.data)
     # Reshaping the distance map to 2D
@@ -52,29 +48,6 @@ def single_shot_save(cam_ip, path):
     # 2D distance map to sparse matrix
     # distance_sparse = sparse.csr_matrix(distance_reshaped)
 
-    np = unpackMessageToNumpy(msg.data)
-    i = Image.fromarray(np)
-    i.save('images/raw_image.png')
-    image_path = path + '{}.png'.format(datetime.datetime.now())
-    i.save(image_path, 'PNG')
-
-    data.append({'name': get_image_name(image_path), 'distance_map': distance})
-    with open('data.json', 'w') as outfile:
-        json.dump(data, outfile)
-    return ctx
-
-
-def single_shot(cam_ip):
-    numpy.set_printoptions(threshold=sys.maxsize)
-    ctx = Context(appname="stereo", server=cam_ip, port="8888")
-    ctx.setProperty("stereo_target_camera_enabled", bool(1))
-
-    # Set Camera Model to Pinhole
-    ctx.setProperty("stereo_target_camera_model", 4)
-    msg = ctx.readTopic("image")
-
-    msg1 = ctx.readTopic("distance")
-    distance = unpackMessageToNumpy(msg1.data)
     np = unpackMessageToNumpy(msg.data)
     i = Image.fromarray(np)
     i.save('images/raw_image.png')

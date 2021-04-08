@@ -1,0 +1,17 @@
+version: '3'
+services:
+ camera:
+   build:
+     context: .
+     dockerfile: ./docker/Dockerfile
+     args:
+       http_proxy: 'http://qqcomi1:comxr0fl@192.109.190.88:8080'
+       https_proxy: 'http://qqcomi1:comxr0fl@192.109.190.88:8080'
+   volumes:
+     - ~/Desktop/raw_images:/app/src/raw_images
+     - ~/Desktop/labeled_images:/app/src/labeled_images
+   ports:
+     - "8000:1234"
+
+
+
