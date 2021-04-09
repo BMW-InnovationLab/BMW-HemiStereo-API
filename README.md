@@ -4,6 +4,8 @@ This is a repository for an object detection inference API using the Hemistereo 
 
 It allows you to label an object based on the training of a model from the deeplearning06.muc:4344/ server. Also, it allows you to calculate the distance of the object from the camera, as well as its dimensions: depth, width and height.
 
+*Note that to use the deeplearning server, you have to be connected to the BMW Network.*
+
 ## Prerequisites
 
 - Ubuntu 18.04
@@ -33,7 +35,7 @@ Install the Hemistereo Viewer Software following the [official docs](https://3dv
 In order to build the project run the following command from the project's root directory:
 
 ```shell
-sudo docker build -t hemisterei_inference_api -f docker/Dockerfile .
+sudo docker build -t hemistereo_inference_api -f docker/Dockerfile .
 ```
 
 ### Behind a proxy
@@ -46,8 +48,16 @@ sudo docker build --build-arg http_proxy='' --build-arg https_proxy='' -t hemist
 
 If you wish to deploy this API using **docker**, go to the API's directory and issue the following command:
 
+### On Ubuntu:
+
 ```shell
-sudo docker run -itd -p <docker_host_port>:1234 --restart always hemistereo_inference_api
+sudo docker run -itdv $(pwd)/src/raw_images:/app/raw_images -v $(pwd)/src/labeled_images:/app/labeled_images -p <docker_host_port>:1234 --restart always hemistereo_inference_api
+```
+
+### On Windows:
+
+```bash
+docker run -itdv %cd%\src\raw_images:\app\raw_images -v %cd%\src\labeled_images:\app\labeled_images -p <docker_host_port>:1234 --restart always hemistereo_inference_api
 ```
 
 *Note that <docker_host_port> can be any unique port of your choice.*
@@ -74,9 +84,19 @@ http://<hemistereo_camera_IP>:<docker_host_port>/docs
 
 ##### /single_shot (POST)
 
-Returns a picture captured by the camera. This is a raw image, hence no objects are labeled yet.
+Returns a picture captured by the camera. This is a raw image, hence no objects are labeled yet. Moreover, this endpoint saves the name (which is a datetime stamp) and the distance map of the image in a data.json file for later use.
+
+*Note that there is a watcher.py file that listens to the directory in which the images are being saved. It detects any change made in the directory: so if an image is deleted, its information will be automatically removed from the data.json file.*
 
 ![](/docs/singleshot.gif)
+
+##### /single_shot/distance_map (POST)
+
+This endpoint returns and saves the raw image with its distance map.
+
+##### /set_threshold (POST)
+
+Allows the user to manually calibrate the camera in terms of textureness threshold.
 
 ##### /detect (POST)
 
@@ -85,6 +105,10 @@ Performs object detection and labeling on a specific object based on the trained
 It returns bounding boxes, distance and dimensions: width, depth and height.
 
 ![](/docs/detect_object.gif)
+
+##### /detect_input (POST)
+
+Allows the user to attach a previously saved raw image (not labeled) in order to detect it, label it and measure it. This endpoint uses the information previously saved in the data.json file while saving the image.
 
 ##### /detect/save_image (POST)
 
@@ -121,4 +145,6 @@ Usually, the more the object is far from the camera, the more you increase the t
 ![](/docs/textureness_threshold.gif)
 
 There are much more parameters you can change and play around with but these are the most used ones for camera calibration.
+
+
 

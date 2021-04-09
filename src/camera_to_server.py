@@ -47,9 +47,10 @@ def see_raw_image(cam_ip: str = Form(...)):
     return FileResponse(image_path)
 
 
+# Need to save image in a directory and bind it to a volume in docker
 @app.post("/single_shot/distance_map")
-def see_raw_image(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...), path: str = Form(...)):
-    ctx = single_shot(cam_ip, path)
+def see_image_with_distance_map(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...)):
+    ctx = single_shot(cam_ip)
     msg = ctx.readTopic("distance")
     rgb = unpackMessageToNumpy(msg.data)
     rgb = formatNumpyToRGB(rgb)

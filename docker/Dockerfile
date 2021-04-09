@@ -2,7 +2,7 @@ FROM python:3.8
 WORKDIR /app
 
 COPY docker/requirements.txt .
-COPY src .
+COPY src/ .
 RUN apt-get update && apt-get install python-pip ffmpeg libsm6 libxext6 -y
 RUN pip install fastapi[all]
 RUN pip3 install matplotlib
@@ -12,4 +12,5 @@ WORKDIR pythonsdk
 RUN pip3 install -r requirements.txt
 RUN pip3 install .
 WORKDIR /app
-CMD ["uvicorn", "camera_to_server:app", "--host", "0.0.0.0", "--port", "1234"]
+# CMD ["uvicorn", "camera_to_server:app", "--host", "0.0.0.0", "--port", "1234"]
+CMD ["camera_to_server.py"]
