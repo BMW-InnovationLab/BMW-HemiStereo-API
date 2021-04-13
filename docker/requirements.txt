@@ -35,3 +35,4 @@ pandas~=1.2.2
 imutils~=0.5.4
 scipy~=1.6.0
 image_slicer
+scikit-learn==0.24.1

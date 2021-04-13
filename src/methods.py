@@ -9,6 +9,8 @@ from numpy import *
 import sys
 import json
 
+from src.pythonsdk.hemistereo import unpackMessageToMeta, unpackMessageToMessageMap
+
 user = getpass.getuser()
 h_sensor = 768
 w_sensor = 1024
@@ -114,6 +116,7 @@ def detect(model, server, cam_ip):
     answer = get_answer(model, server, 'images/raw_image.png')
     message = ctx.readTopic("distance")
     distance = unpackMessageToNumpy(message.data)
+
     # define coordinates of bounding box vertices around detected object
     if len(answer["bounding-boxes"]) > 0:
         for box in range(len(answer['bounding-boxes'])):
