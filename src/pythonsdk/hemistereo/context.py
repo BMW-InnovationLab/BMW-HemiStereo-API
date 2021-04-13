@@ -25,8 +25,14 @@ class Context:
                 ('grpc.max_receive_message_length', -1),
             ])
         self.stub = hsapp.ApplicationServiceStub( self.chan )
+        
         self.activeTopics = []
-
+    def getInterfaceVersion( self ):
+        req = hsapp_msg.VersionRequest()
+        return self.stub.GetInterfaceVersion( request=req, metadata=self.metadata )
+    def getApplicationVersion( self ):
+        req = hsapp_msg.VersionRequest()
+        return self.stub.GetApplicationVersion( request=req, metadata=self.metadata )
     def getApplication( self ):
         req = hsapp_msg.GetApplicationRequest()
         return self.stub.GetApplication( request=req, metadata=self.metadata)

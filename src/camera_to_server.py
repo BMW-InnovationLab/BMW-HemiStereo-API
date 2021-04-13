@@ -2,10 +2,10 @@ from fastapi import FastAPI, Form, UploadFile, File
 from fastapi.responses import FileResponse
 from starlette.responses import StreamingResponse
 import uvicorn
-from methods import *
 import io
 import shutil
 import getpass
+import datetime
 from watcher import *
 import threading
 import time
@@ -50,7 +50,7 @@ def see_raw_image(cam_ip: str = Form(...)):
 # Need to save image in a directory and bind it to a volume in docker
 @app.post("/single_shot/distance_map")
 def see_image_with_distance_map(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...)):
-    ctx = single_shot(cam_ip)
+    ctx = single_shot_save(cam_ip)
     msg = ctx.readTopic("distance")
     rgb = unpackMessageToNumpy(msg.data)
     rgb = formatNumpyToRGB(rgb)
@@ -65,10 +65,8 @@ def see_image_with_distance_map(model: str = Form(...), server: str = Form(...),
 
 
 @app.post("/set_threshold")
-def set_threshold(cam_ip=Form(...), model=Form(...), server=Form(...)):
-    return compute_threshold(cam_ip, model, server)
-
-
+# def set_threshold(cam_ip=Form(...), model=Form(...), server=Form(...)):
+#     return compute_threshold(cam_ip, model, server)
 @app.post("/detect")
 def detect_object(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...)):
     # open('raw_image.png', server).write(r.content)

@@ -27,13 +27,11 @@ python-dotenv
 python-multipart==0.0.5
 uvicorn~=0.13.3
 uvloop==0.14.0
-watchgod
+watchdog==2.0.2
 
 setuptools~=52.0.0
-hemistereo~=1.0.2
 pyntcloud~=0.1.4
 pandas~=1.2.2
 imutils~=0.5.4
 scipy~=1.6.0
-shutil
-image_slicer==2.1.1
+image_slicer

@@ -52,7 +52,7 @@ for d in dirs:
 
 setuptools.setup(
     name="hemistereo",
-    version="1.0.2",
+    version="1.1.0",
     author="3dvisionlabs",
     author_email="support@3dvisionlabs.com",
     description="HemiStereo sample and wrapper module",

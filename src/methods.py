@@ -7,9 +7,7 @@ import ast
 import getpass
 from numpy import *
 import sys
-import datetime
 import json
-from scipy import sparse
 
 user = getpass.getuser()
 h_sensor = 768
@@ -54,6 +52,11 @@ def single_shot_save(cam_ip):
     np = unpackMessageToNumpy(msg.data)
     i = Image.fromarray(np)
     i.save('images/raw_image.png')
+
+    message = ctx.readTopic("stereo_frame")
+    mmap = unpackMessageToMessageMap(message)
+    meta = unpackMessageToMeta(mmap["metadata"])
+    print(meta)
     return ctx
 
 
@@ -74,7 +77,7 @@ def get_answer(model, server, image_path):
 
 # This function calculates the distance between the camera and the labeled object
 def calculate_distance(model, server, cam_ip):
-    ctx = single_shot(cam_ip)
+    ctx = single_shot_save(cam_ip)
     nearest_pixel = sys.maxsize
     print('Sending image to api with specified model')
     answer = get_answer(model, server, "images/raw_image.png")
@@ -101,7 +104,7 @@ def calculate_distance(model, server, cam_ip):
 
 def detect(model, server, cam_ip):
     # Detect Object
-    ctx = single_shot(cam_ip)
+    ctx = single_shot_save(cam_ip)
     msg = ctx.readTopic("image")
     nump = unpackMessageToNumpy(msg.data)
     nearest_pixel = sys.maxsize
@@ -163,12 +166,12 @@ def detect(model, server, cam_ip):
 
 
 # Still needs fixing!!
-def compute_threshold(cam_ip):
-    distance, ctx = calculate_distance(model, server, cam_ip)
-    # Must do linear regression model. This formula does not always stand!!
-    textureness = 0.271 * (distance / 10) + 9.52
-    ctx.setProperty("stereo_textureness_filter_average_textureness", np.float32(textureness))
-    return textureness
+# def compute_threshold(cam_ip):
+#     distance, ctx = calculate_distance(model, server, cam_ip)
+#     # Must do linear regression model. This formula does not always stand!!
+#     textureness = 0.271 * (distance / 10) + 9.52
+#     ctx.setProperty("stereo_textureness_filter_average_textureness", np.float32(textureness))
+#     return textureness
 
 
 # Detect and label input image

@@ -2,7 +2,7 @@ import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import json
-import methods.py
+from methods import *
 
 
 class Watcher:

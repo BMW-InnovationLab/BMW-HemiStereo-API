@@ -1,10 +1,17 @@
 syntax = "proto3";
 
 import "google/api/annotations.proto";
+import "google/protobuf/descriptor.proto";
 import "hemistereo/network/messages/message.proto";
 
 option go_package = "git.3dvisionlabs.com/3dvisionlabs/software/hemistereo/genproto.git/proto/hemistereo/network/services";
 package hs.network.proto;
+
+message Version {
+  int32 versionMajor = 1;
+  int32 versionMinor = 2;
+  int32 versionPatch = 3;
+}
 
 /* Represents a 32-bit signed integer. */
 message PropertyInt32 {
@@ -186,6 +193,8 @@ message CallRequest {
       2;  // The input parameter of the method.
 }
 
+message VersionRequest {}
+
 /* Represents an event. */
 message Event {
   enum Type {
@@ -217,23 +226,41 @@ message Event {
 
 /* Represents a request to query if topic reads are enabled. */
 message GetReadTopicEnabledRequest {
+  option deprecated = true;
   string path = 1;  // The path of the topic.
 }
 
 /* Represents the response to query if topic reads are enabled. */
 message GetReadTopicEnabledResponse {
+  option deprecated = true;
   bool value = 1;  // Indicates if topic reads are enabled.
 }
 
 /* Request to enable/disable topic reads. */
 message SetReadTopicEnabledRequest {
+  option deprecated = true;
   string path = 1;  // The path of the topic.
   bool value = 2;   // Enables or disables topic reads.
 }
 
-message SetReadTopicEnabledResponse {}
+message SetReadTopicEnabledResponse {
+  option deprecated = true;
+}
 
 service ApplicationService {
+
+  rpc GetInterfaceVersion(VersionRequest) returns (Version) {
+    option (google.api.http) = {
+      get: "/api/version"
+    };
+  }
+
+  rpc GetApplicationVersion(VersionRequest) returns (Version) {
+    option (google.api.http) = {
+      get: "/api/application/version"
+    };
+  }
+
   /* Used to get the current Application. */
   rpc GetApplication(GetApplicationRequest) returns (Node) {
     option (google.api.http) = {
@@ -281,6 +308,7 @@ service ApplicationService {
   /* Used to query if topic reads are enabled for topic at {path}. */
   rpc GetReadTopicEnabled(GetReadTopicEnabledRequest)
       returns (GetReadTopicEnabledResponse) {
+    option deprecated = true;
     option (google.api.http) = {
       get: "/api/application/output/{path}/read-enabled"
     };
@@ -289,6 +317,7 @@ service ApplicationService {
   /* Used to enable/disable topic reads for topic at {path}. */
   rpc SetReadTopicEnabled(SetReadTopicEnabledRequest)
       returns (SetReadTopicEnabledResponse) {
+    option deprecated = true;
     option (google.api.http) = {
       put: "/api/application/output/{path}/set-read-enabled"
       body: "value"

@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package hs.network.proto.messages;
+
+option go_package = "git.3dvisionlabs.com/3dvisionlabs/software/hemistereo/genproto.git/proto/hemistereo/network/messages";
+
+message CaptureMetadata {
+    int64 timestamp = 1;
+    float sensorAnalogGain = 2;
+    uint64 sensorExposureTime = 3;
+    uint64 sensorSensitivity = 4;
+    float ispDigitalGain = 5;
+    float sceneLux = 6;
+    float achievedFps = 7;
+}
