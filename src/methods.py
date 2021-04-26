@@ -1,3 +1,5 @@
+import numpy
+
 from hemistereo import *
 import pycurl
 from PIL import Image
@@ -5,60 +7,56 @@ import cv2
 from io import BytesIO
 import ast
 import getpass
+
+from matplotlib._path import point_in_path
 from numpy import *
 import sys
 import json
+import matplotlib.pyplot as plt
+from linear_regression_model import *
 
-from src.pythonsdk.hemistereo import unpackMessageToMeta, unpackMessageToMessageMap
+from hemistereo import formatNumpyToPointCloud
 
 user = getpass.getuser()
-h_sensor = 768
+h_sensor = 800
 w_sensor = 1024
 theta_d_max = 1.74532925199432953355938
 
 field_of_view_h = 140
-field_of_view_v = 140
+field_of_view_v = 136
 
 fov_h_rad = field_of_view_h * math.pi / 180
 fov_v_rad = field_of_view_v * math.pi / 180
 
-data = []
-
 
 # Function to get the name of the image from its path
 def get_image_name(image_path):
-    if image_path[0] == "/":
-        arr = image_path.split('/')
-    else:
-        arr = image_path.split('\\')
+    arr = image_path.split('/')
     return arr[-1]
 
 
-# Still need to set all camera settings.
+# Take a picture
 def single_shot_save(cam_ip):
     numpy.set_printoptions(threshold=sys.maxsize)
     ctx = Context(appname="stereo", server=cam_ip, port="8888")
+    dist = ctx.readTopic("distance")
+    distance = unpackMessageToNumpy(dist.data)
     ctx.setProperty("stereo_target_camera_enabled", bool(1))
 
     # Set Camera Model to Pinhole
     ctx.setProperty("stereo_target_camera_model", 4)
     msg = ctx.readTopic("image")
 
-    # Unpacking distance map to numpy array
-    # distance = unpackMessageToNumpy(msg1.data)
-    # Reshaping the distance map to 2D
-    # distance_reshaped = distance.reshape(distance.shape[0], -1)
-    # 2D distance map to sparse matrix
-    # distance_sparse = sparse.csr_matrix(distance_reshaped)
+    # Set Camera Field of View
+    ctx.setProperty("stereo_target_image_fov_h", numpy.single(field_of_view_h))
+    ctx.setProperty("stereo_target_image_fov_v", numpy.single(field_of_view_v))
+    ctx.setProperty("stereo_matching_image_fov_v", numpy.single(field_of_view_v))
+    ctx.setProperty("stereo_matching_image_fov_h", numpy.single(field_of_view_h))
 
+    # Save Image
     np = unpackMessageToNumpy(msg.data)
     i = Image.fromarray(np)
     i.save('images/raw_image.png')
-
-    message = ctx.readTopic("stereo_frame")
-    mmap = unpackMessageToMessageMap(message)
-    meta = unpackMessageToMeta(mmap["metadata"])
-    print(meta)
     return ctx
 
 
@@ -114,10 +112,10 @@ def detect(model, server, cam_ip):
     depth = 0
     print('Sending image to api with specified model')
     answer = get_answer(model, server, 'images/raw_image.png')
-    message = ctx.readTopic("distance")
-    distance = unpackMessageToNumpy(message.data)
-
+    # message = ctx.readTopic("distance")
+    # distance = unpackMessageToNumpy(message.data)
     # define coordinates of bounding box vertices around detected object
+    point_cloud = unpackMessageToNumpy(ctx.readTopic("pointcloud").data)
     if len(answer["bounding-boxes"]) > 0:
         for box in range(len(answer['bounding-boxes'])):
             object_class_name = answer['bounding-boxes'][box]['ObjectClassName']
@@ -129,16 +127,17 @@ def detect(model, server, cam_ip):
             # Locate labeled object in the numpy array
             for i in range(left, right):
                 for j in range(top, bottom):
-                    if distance[j][i] < nearest_pixel and distance[j][i] != 0:
-                        nearest_pixel = distance[j][i][0]
-                    if distance[j][i] > far_pixel:
-                        far_pixel = distance[j][i][0]
+                    if point_cloud[j][i][2] < nearest_pixel and point_cloud[j][i][2] != 0:
+                        nearest_pixel = point_cloud[j][i][2]
+                    if point_cloud[j][i][2] > far_pixel:
+                        far_pixel = point_cloud[j][i][2]
+
             # Draw Bounding Box
             cv2.rectangle(nump, (right, top), (left, bottom), (255, 0, 0), 2)
             img = Image.fromarray(nump, 'RGB')
+
             # Object's depth
             depth = (far_pixel - nearest_pixel) / 10
-            print("field of view v: " + str(ctx.getProperty("stereo_matching_image_fov_v")))
 
             # Variable Distance Camera
             # Formulas to calculate height and width of object depending on its distance from
@@ -158,9 +157,10 @@ def detect(model, server, cam_ip):
         nearest_pixel = -1
 
     if nearest_pixel > 0:
-        answer['bounding-boxes'][box]['dimensions'] = {"depth": depth, "width": float("{:.2f}".format(width_obj)),
+        answer['bounding-boxes'][box]['dimensions'] = {"depth": float("{:.2f}".format(depth)),
+                                                       "width": float("{:.2f}".format(width_obj)),
                                                        "height": float("{:.2f}".format(height_obj))}
-        answer['bounding-boxes'][box]['distance'] = float(nearest_pixel / 10)
+        answer['bounding-boxes'][box]['distance'] = float("{:.2f}".format(nearest_pixel / 10))
 
     else:
         print("No objects labeled.")
@@ -169,26 +169,29 @@ def detect(model, server, cam_ip):
 
 
 # Still needs fixing!!
-# def compute_threshold(cam_ip):
-#     distance, ctx = calculate_distance(model, server, cam_ip)
-#     # Must do linear regression model. This formula does not always stand!!
-#     textureness = 0.271 * (distance / 10) + 9.52
-#     ctx.setProperty("stereo_textureness_filter_average_textureness", np.float32(textureness))
-#     return textureness
+def calibrate(cam_ip, model, server):
+    distance, ctx = calculate_distance(model, server, cam_ip)
+    message = ctx.readTopic("stereo_frame")
+    mmap = unpackMessageToMessageMap(message)
+    meta = unpackMessageToMeta(mmap["metadata"])
+    # Must do linear regression model. This formula does not always stand!!
+    thresh_pred = linear_regression([[distance, meta.sceneLux]])
+    ctx.setProperty("stereo_textureness_filter_average_textureness", np.float32(thresh_pred[0]))
+    return thresh_pred[0]
 
 
 # Detect and label input image
 def detect_object_image(image_name, model, server):
     nearest_pixel = sys.maxsize
     far_pixel = 0
+    loaded_distance= []
+    load_numpy_distance = []
 
-    answer = get_answer(model, server, "images/test.png")
+    answer = get_answer(model, server, "raw_images/" + image_name)
 
-    image = Image.open("images/test.png")
+    image = Image.open("raw_images/" + image_name)
     # Convert img to numpy array
     numpy_data = asarray(image)
-
-    loaded_distance = []
 
     # Retrieving data from file
     with open('data.json', 'r') as outfile:
@@ -196,12 +199,12 @@ def detect_object_image(image_name, model, server):
         for element in read_list:
             if element['name'] == image_name:
                 loaded_distance = element['distance_map']
-
     # This loaded distance array is a list, therefore
     # we need to convert it to a numpy array
     if len(loaded_distance) != 0:
         load_numpy_distance = numpy.array(loaded_distance)
         load_numpy_distance = load_numpy_distance.reshape(load_numpy_distance.shape[0], load_numpy_distance.shape[1], 1)
+
     # Locates object with bounding boxes.
     if len(answer["bounding-boxes"]) > 0:
         for box in range(len(answer['bounding-boxes'])):
@@ -221,6 +224,7 @@ def detect_object_image(image_name, model, server):
 
         cv2.rectangle(numpy_data, (right, top), (left, bottom), (255, 0, 0), 2)
         img = Image.fromarray(numpy_data, 'RGB')
+
         # Object's depth
         depth = (far_pixel - nearest_pixel) / 10
 
@@ -238,9 +242,10 @@ def detect_object_image(image_name, model, server):
         nearest_pixel = -1
 
     if nearest_pixel > 0:
-        answer['bounding-boxes'][box]['dimensions'] = {"depth": depth, "width": float("{:.2f}".format(width_obj)),
+        answer['bounding-boxes'][box]['dimensions'] = {"depth": float("{:.2f}".format(depth)),
+                                                       "width": float("{:.2f}".format(width_obj)),
                                                        "height": float("{:.2f}".format(height_obj))}
-        answer['bounding-boxes'][box]['distance'] = float(nearest_pixel / 10)
+        answer['bounding-boxes'][box]['distance'] = float("{:.2f}".format(nearest_pixel / 10))
 
     else:
         print("No objects labeled.")

@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI, Form, UploadFile, File
 from fastapi.responses import FileResponse
 from starlette.responses import StreamingResponse
@@ -34,22 +36,31 @@ def see_raw_image(cam_ip: str = Form(...)):
     im = ctx.readTopic("image")
     np = unpackMessageToNumpy(im.data)
     msg = ctx.readTopic("distance")
+
     # 3D distance map to list
     distance = unpackMessageToNumpy(msg.data).tolist()
+    # point_cloud = unpackMessageToNumpy(ctx.readTopic("pointcloud").data).tolist()
 
     image_path = "raw_images/{}.png".format(datetime.datetime.now())
     i = Image.fromarray(np)
     i.save(image_path, 'PNG')
+    outfile = open('data.json', 'r+')
+    data_size = os.stat('data.json').st_size
+    print("Size:", data_size)
+    if data_size == 0 or data_size == 2:
+        data = []
+    else:
+        data = json.load(outfile)
     data.append({'name': get_image_name(image_path), 'distance_map': distance})
-    with open('data.json', 'w') as outfile:
-        json.dump(data, outfile)
-    # i.save('/home/{}/Downloads/images/{}.png'.format(user, datetime.datetime.now()))
+
+    outfile.seek(0)  # rewind
+    json.dump(data, outfile)
+    outfile.truncate()
     return FileResponse(image_path)
 
 
-# Need to save image in a directory and bind it to a volume in docker
 @app.post("/single_shot/distance_map")
-def see_image_with_distance_map(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...)):
+def see_image_with_distance_map(cam_ip: str = Form(...)):
     ctx = single_shot_save(cam_ip)
     msg = ctx.readTopic("distance")
     rgb = unpackMessageToNumpy(msg.data)
@@ -60,13 +71,14 @@ def see_image_with_distance_map(model: str = Form(...), server: str = Form(...),
     im2 = cv2.imread('images/distance_map.png')
     im_h = cv2.hconcat([im1, im2])
     cv2.imwrite('images/raw+dist.png', im_h)
-    # return StreamingResponse(io.BytesIO(im_h.tobytes()), media_type="image/png")
     return FileResponse('images/raw+dist.png')
 
 
 @app.post("/set_threshold")
-# def set_threshold(cam_ip=Form(...), model=Form(...), server=Form(...)):
-#     return compute_threshold(cam_ip, model, server)
+def set_threshold(cam_ip=Form(...), model=Form(...), server=Form(...)):
+    return calibrate(cam_ip, model, server)
+
+
 @app.post("/detect")
 def detect_object(model: str = Form(...), server: str = Form(...), cam_ip: str = Form(...)):
     # open('raw_image.png', server).write(r.content)

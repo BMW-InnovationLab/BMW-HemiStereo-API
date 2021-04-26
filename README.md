@@ -98,6 +98,8 @@ This endpoint returns and saves the raw image with its distance map.
 
 Allows the user to manually calibrate the camera in terms of textureness threshold.
 
+![](/docs/set_threshold.gif)
+
 ##### /detect (POST)
 
 Performs object detection and labeling on a specific object based on the trained model it is using.
@@ -110,11 +112,13 @@ It returns bounding boxes, distance and dimensions: width, depth and height.
 
 Allows the user to attach a previously saved raw image (not labeled) in order to detect it, label it and measure it. This endpoint uses the information previously saved in the data.json file while saving the image.
 
+![](/docs/detect_input_image.gif)
+
 ##### /detect/save_image (POST)
 
-![](/docs/save_labeled_image.gif)
+This endpoint allows the user to detect and save the labeled image.
 
-...
+![](/docs/save_labeled_image.gif)
 
 ## Hemistereo Viewer Software Tutorial
 
