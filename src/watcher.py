@@ -1,8 +1,7 @@
-import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import json
 from methods import *
+import os
 
 
 class Watcher:
@@ -27,24 +26,18 @@ class Watcher:
 
 
 class Handler(FileSystemEventHandler):
-    # data = []
 
     @staticmethod
     def on_any_event(event):
-        image_path = event.src_path
-        image_name = get_image_name(image_path)
+
         if event.is_directory:
             return None
-
+        # Removes the pickle file specific to the image deleted
         elif event.event_type == 'deleted':
-            # Taken any action here when a file is modified.
-            data_file = open('data.json', 'r')
-            read_list = json.load(data_file)
-            for element in read_list:
-                if element['name'] == image_name:
-                    read_list.remove(element)
-            data_file.close()
-            data_file = open('data.json', 'w')
-            json.dump(read_list, data_file)
-            data_file.close()
+            image_path = event.src_path
+            image_name = get_image_name(image_path)
+            image_name = image_name[0:image_name.index('.p')]
+            os.remove('pickle_files/' + image_name)
+
+
 

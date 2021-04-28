@@ -1,4 +1,5 @@
-import numpy
+import pickle
+import time
 
 from hemistereo import *
 import pycurl
@@ -7,15 +8,10 @@ import cv2
 from io import BytesIO
 import ast
 import getpass
-
-from matplotlib._path import point_in_path
 from numpy import *
 import sys
-import json
-import matplotlib.pyplot as plt
 from linear_regression_model import *
 
-from hemistereo import formatNumpyToPointCloud
 
 user = getpass.getuser()
 h_sensor = 800
@@ -28,32 +24,21 @@ field_of_view_v = 136
 fov_h_rad = field_of_view_h * math.pi / 180
 fov_v_rad = field_of_view_v * math.pi / 180
 
+numpy.set_printoptions(threshold=sys.maxsize)
+
 
 # Function to get the name of the image from its path
 def get_image_name(image_path):
     arr = image_path.split('/')
-    return arr[-1]
+    image_name = arr[-1]
+    return image_name
 
 
 # Take a picture
 def single_shot_save(cam_ip):
-    numpy.set_printoptions(threshold=sys.maxsize)
     ctx = Context(appname="stereo", server=cam_ip, port="8888")
-    dist = ctx.readTopic("distance")
-    distance = unpackMessageToNumpy(dist.data)
-    ctx.setProperty("stereo_target_camera_enabled", bool(1))
-
-    # Set Camera Model to Pinhole
-    ctx.setProperty("stereo_target_camera_model", 4)
-    msg = ctx.readTopic("image")
-
-    # Set Camera Field of View
-    ctx.setProperty("stereo_target_image_fov_h", numpy.single(field_of_view_h))
-    ctx.setProperty("stereo_target_image_fov_v", numpy.single(field_of_view_v))
-    ctx.setProperty("stereo_matching_image_fov_v", numpy.single(field_of_view_v))
-    ctx.setProperty("stereo_matching_image_fov_h", numpy.single(field_of_view_h))
-
     # Save Image
+    msg = ctx.readTopic("image")
     np = unpackMessageToNumpy(msg.data)
     i = Image.fromarray(np)
     i.save('images/raw_image.png')
@@ -102,7 +87,8 @@ def calculate_distance(model, server, cam_ip):
     return nearest_pixel, ctx
 
 
-def detect(model, server, cam_ip):
+# Detect and label image
+def detect(model, server, cam_ip, vertical_fov, horizontal_fov):
     # Detect Object
     ctx = single_shot_save(cam_ip)
     msg = ctx.readTopic("image")
@@ -112,8 +98,6 @@ def detect(model, server, cam_ip):
     depth = 0
     print('Sending image to api with specified model')
     answer = get_answer(model, server, 'images/raw_image.png')
-    # message = ctx.readTopic("distance")
-    # distance = unpackMessageToNumpy(message.data)
     # define coordinates of bounding box vertices around detected object
     point_cloud = unpackMessageToNumpy(ctx.readTopic("pointcloud").data)
     if len(answer["bounding-boxes"]) > 0:
@@ -143,16 +127,13 @@ def detect(model, server, cam_ip):
             # Formulas to calculate height and width of object depending on its distance from
             # the camera, as well as on its intrinsic parameters.
             height_px = bottom - top
-            height_obj = nearest_pixel / 10 * (height_px / h_sensor) * math.tan(fov_v_rad / 2) * 2
+            height_obj = nearest_pixel / 10 * (height_px / h_sensor) * math.tan((vertical_fov * math.pi / 180) / 2) * 2
 
             width_px = right - left
-            width_obj = nearest_pixel / 10 * (width_px / w_sensor) * math.tan(fov_h_rad / 2) * 2
+            width_obj = nearest_pixel / 10 * (width_px / w_sensor) * math.tan((horizontal_fov * math.pi / 180) / 2) * 2
 
             img.save('images/labeled_image.png')
 
-        #     if "labeled_images" not in os.listdir('/home/{}/Downloads/'.format(user)):
-        #         os.mkdir('/home/{}/Downloads/labeled_images'.format(user))
-        # img.save(path + '{}.png'.format(datetime.datetime.now()), 'PNG')
     else:
         nearest_pixel = -1
 
@@ -168,24 +149,22 @@ def detect(model, server, cam_ip):
     return answer
 
 
-# Still needs fixing!!
+# Calibrates the camera based on light intensity and distance to the object detected
 def calibrate(cam_ip, model, server):
     distance, ctx = calculate_distance(model, server, cam_ip)
     message = ctx.readTopic("stereo_frame")
     mmap = unpackMessageToMessageMap(message)
     meta = unpackMessageToMeta(mmap["metadata"])
-    # Must do linear regression model. This formula does not always stand!!
     thresh_pred = linear_regression([[distance, meta.sceneLux]])
     ctx.setProperty("stereo_textureness_filter_average_textureness", np.float32(thresh_pred[0]))
     return thresh_pred[0]
 
 
 # Detect and label input image
+# Needs fixing. Should let the user specify the fov or save it for later use.
 def detect_object_image(image_name, model, server):
     nearest_pixel = sys.maxsize
     far_pixel = 0
-    loaded_distance= []
-    load_numpy_distance = []
 
     answer = get_answer(model, server, "raw_images/" + image_name)
 
@@ -193,17 +172,10 @@ def detect_object_image(image_name, model, server):
     # Convert img to numpy array
     numpy_data = asarray(image)
 
-    # Retrieving data from file
-    with open('data.json', 'r') as outfile:
-        read_list = json.load(outfile)
-        for element in read_list:
-            if element['name'] == image_name:
-                loaded_distance = element['distance_map']
-    # This loaded distance array is a list, therefore
-    # we need to convert it to a numpy array
-    if len(loaded_distance) != 0:
-        load_numpy_distance = numpy.array(loaded_distance)
-        load_numpy_distance = load_numpy_distance.reshape(load_numpy_distance.shape[0], load_numpy_distance.shape[1], 1)
+    # Unpickle pickle file
+    infile = open('pickle_files/' + image_name[0:image_name.index('.p')], 'rb')
+    distance = pickle.load(infile)
+    infile.close()
 
     # Locates object with bounding boxes.
     if len(answer["bounding-boxes"]) > 0:
@@ -217,10 +189,10 @@ def detect_object_image(image_name, model, server):
             # Locates the object in the numpy array.
             for i in range(left, right):
                 for j in range(top, bottom):
-                    if load_numpy_distance[j][i][0] < nearest_pixel and load_numpy_distance[j][i][0] != 0:
-                        nearest_pixel = load_numpy_distance[j][i][0]
-                    if load_numpy_distance[j][i][0] > far_pixel:
-                        far_pixel = load_numpy_distance[j][i][0]
+                    if distance[j][i][0] < nearest_pixel and distance[j][i][0] != 0:
+                        nearest_pixel = distance[j][i][0]
+                    if distance[j][i][0] > far_pixel:
+                        far_pixel = distance[j][i][0]
 
         cv2.rectangle(numpy_data, (right, top), (left, bottom), (255, 0, 0), 2)
         img = Image.fromarray(numpy_data, 'RGB')

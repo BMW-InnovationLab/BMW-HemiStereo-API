@@ -2,7 +2,7 @@
 
 This is a repository for an object detection inference API using the Hemistereo NX 180 X camera.
 
-It allows you to label an object based on the training of a model from the server of your choice. Also, it allows you to calculate the distance of the object from the camera, as well as its dimensions: depth, width and height.
+It allows you to label an object based on the training of a model from the deeplearning06.muc:4344/ server. Also, it allows you to calculate the distance of the object from the camera, as well as its dimensions: depth, width and height.
 
 *Note that to use the deeplearning server, you have to be connected to the BMW Network.*
 
@@ -81,6 +81,12 @@ http://<hemistereo_camera_IP>:<docker_host_port>/docs
 ```
 
 #### Endpoints Summary
+
+##### /set_camera_settings
+
+Allows the user to set the vertical and horizontal field of view of the camera.
+
+![](/docs/set_camera_settings.gif)
 
 ##### /single_shot (POST)
 
