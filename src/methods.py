@@ -1,6 +1,4 @@
 import pickle
-import time
-
 from hemistereo import *
 import pycurl
 from PIL import Image
@@ -100,6 +98,7 @@ def detect(model, server, cam_ip, vertical_fov, horizontal_fov):
     answer = get_answer(model, server, 'images/raw_image.png')
     # define coordinates of bounding box vertices around detected object
     point_cloud = unpackMessageToNumpy(ctx.readTopic("pointcloud").data)
+
     if len(answer["bounding-boxes"]) > 0:
         for box in range(len(answer['bounding-boxes'])):
             object_class_name = answer['bounding-boxes'][box]['ObjectClassName']
@@ -109,12 +108,13 @@ def detect(model, server, cam_ip, vertical_fov, horizontal_fov):
             right = bounding_box['right']
             top = bounding_box['top']
             # Locate labeled object in the numpy array
-            for i in range(left, right):
-                for j in range(top, bottom):
-                    if point_cloud[j][i][2] < nearest_pixel and point_cloud[j][i][2] != 0:
-                        nearest_pixel = point_cloud[j][i][2]
-                    if point_cloud[j][i][2] > far_pixel:
-                        far_pixel = point_cloud[j][i][2]
+            point_cloud_copy = point_cloud[top:bottom, left:right, 2]
+            for i in range(right-left):
+                for j in range(bottom-top):
+                    if point_cloud_copy[j][i] < nearest_pixel and point_cloud_copy[j][i] != 0:
+                        nearest_pixel = point_cloud_copy[j][i]
+                    if point_cloud_copy[j][i] > far_pixel:
+                        far_pixel = point_cloud_copy[j][i]
 
             # Draw Bounding Box
             cv2.rectangle(nump, (right, top), (left, bottom), (255, 0, 0), 2)
@@ -162,7 +162,7 @@ def calibrate(cam_ip, model, server):
 
 # Detect and label input image
 # Needs fixing. Should let the user specify the fov or save it for later use.
-def detect_object_image(image_name, model, server):
+def detect_object_image(image_name, model, server, vertical_fov, horizontal_fov):
     nearest_pixel = sys.maxsize
     far_pixel = 0
 
@@ -204,10 +204,10 @@ def detect_object_image(image_name, model, server):
         # Formulas to calculate height and width of object depending on its distance from
         # the camera, as well as on its intrinsic parameters.
         height_px = bottom - top
-        height_obj = nearest_pixel / 10 * (height_px / h_sensor) * math.tan(fov_v_rad / 2) * 2
+        height_obj = nearest_pixel / 10 * (height_px / h_sensor) * math.tan((vertical_fov * math.pi / 180) / 2) * 2
 
         width_px = right - left
-        width_obj = nearest_pixel / 10 * (width_px / w_sensor) * math.tan(fov_h_rad / 2) * 2
+        width_obj = nearest_pixel / 10 * (width_px / w_sensor) * math.tan((horizontal_fov * math.pi / 180) / 2) * 2
 
         img.save('images/labeled_image.png')
     else:

@@ -116,10 +116,11 @@ def detect_object(item: CameraParameters):
 
 
 @app.post("/detect_input")
-def detect_object_from_input_image(image: UploadFile = File(...), model=Form(...), server=Form(...)):
+def detect_object_from_input_image(image: UploadFile = File(...), model=Form(...), server=Form(...),
+                                   vertical_fov: int = Form(...), horizontal_fov: int = Form(...)):
     with open("images/test.png", "wb") as buffer:
         shutil.copyfileobj(image.file, buffer)
-    return detect_object_image(image.filename, model, server)
+    return detect_object_image(image.filename, model, server, vertical_fov, horizontal_fov)
 
 
 @app.post("/detect/save_image")
