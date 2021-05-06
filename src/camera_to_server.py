@@ -64,15 +64,15 @@ def set_camera_settings(item: ShotParameters):
 
 @app.post("/single_shot")
 def see_raw_image(cam_ip: str = Form(...)):
-    ctx = single_shot_save(cam_ip)
-    im = ctx.readTopic("image")
-    np = unpackMessageToNumpy(im.data)
-    msg = ctx.readTopic("distance")
+
+    ctx = Context(appname="stereo", server=cam_ip, port="8888")
+    # Save Image
+    msg = ctx.readTopic("image")
+    np = unpackMessageToNumpy(msg.data)
+    # msg = ctx.readTopic("distance")
 
     # 3D distance map to list
-    # distance = unpackMessageToNumpy(msg.data).tolist()
     distance = unpackMessageToNumpy(msg.data)
-    # point_cloud = unpackMessageToNumpy(ctx.readTopic("pointcloud").data).tolist()
 
     image_path = "raw_images/{}.png".format(datetime.datetime.now())
     i = Image.fromarray(np)
@@ -110,7 +110,6 @@ def set_threshold(item: Calibration):
 
 @app.post("/detect")
 def detect_object(item: CameraParameters):
-    # open('raw_image.png', server).write(r.content)
     return detect(item.model, item.server, item.cam_ip, item.vertical_fov,
                   item.horizontal_fov)
 

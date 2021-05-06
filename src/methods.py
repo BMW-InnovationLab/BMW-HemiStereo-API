@@ -10,17 +10,9 @@ from numpy import *
 import sys
 from linear_regression_model import *
 
-
 user = getpass.getuser()
 h_sensor = 800
 w_sensor = 1024
-theta_d_max = 1.74532925199432953355938
-
-field_of_view_h = 140
-field_of_view_v = 136
-
-fov_h_rad = field_of_view_h * math.pi / 180
-fov_v_rad = field_of_view_v * math.pi / 180
 
 numpy.set_printoptions(threshold=sys.maxsize)
 
@@ -34,12 +26,13 @@ def get_image_name(image_path):
 
 # Take a picture
 def single_shot_save(cam_ip):
+    # while True:
     ctx = Context(appname="stereo", server=cam_ip, port="8888")
     # Save Image
     msg = ctx.readTopic("image")
     np = unpackMessageToNumpy(msg.data)
     i = Image.fromarray(np)
-    i.save('images/raw_image.png')
+    # i.save('images/raw_image.png')
     return ctx
 
 
@@ -109,8 +102,8 @@ def detect(model, server, cam_ip, vertical_fov, horizontal_fov):
             top = bounding_box['top']
             # Locate labeled object in the numpy array
             point_cloud_copy = point_cloud[top:bottom, left:right, 2]
-            for i in range(right-left):
-                for j in range(bottom-top):
+            for i in range(right - left):
+                for j in range(bottom - top):
                     if point_cloud_copy[j][i] < nearest_pixel and point_cloud_copy[j][i] != 0:
                         nearest_pixel = point_cloud_copy[j][i]
                     if point_cloud_copy[j][i] > far_pixel:
