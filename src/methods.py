@@ -32,7 +32,7 @@ def single_shot_save(cam_ip):
     msg = ctx.readTopic("image")
     np = unpackMessageToNumpy(msg.data)
     i = Image.fromarray(np)
-    # i.save('images/raw_image.png')
+    i.save('images/raw_image.png')
     return ctx
 
 
@@ -190,6 +190,9 @@ def detect_object_image(image_name, model, server, vertical_fov, horizontal_fov)
         cv2.rectangle(numpy_data, (right, top), (left, bottom), (255, 0, 0), 2)
         img = Image.fromarray(numpy_data, 'RGB')
 
+        print(far_pixel)
+        print(nearest_pixel)
+
         # Object's depth
         depth = (far_pixel - nearest_pixel) / 10
 
@@ -201,7 +204,6 @@ def detect_object_image(image_name, model, server, vertical_fov, horizontal_fov)
 
         width_px = right - left
         width_obj = nearest_pixel / 10 * (width_px / w_sensor) * math.tan((horizontal_fov * math.pi / 180) / 2) * 2
-
         img.save('images/labeled_image.png')
     else:
         nearest_pixel = -1

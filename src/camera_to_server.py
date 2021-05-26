@@ -62,14 +62,33 @@ def set_camera_settings(item: ShotParameters):
     ctx.setProperty("stereo_matching_image_fov_h", numpy.single(item.horizontal_fov))
 
 
+# @app.post("/big_image")
+# def big_image(cam_ip: str = Form(...)):
+#     ctx = Context(appname="stereo", server=cam_ip, port="8888")
+#     ctx.setProperty("raw_image_output_enabled", numpy.bool(True))
+#     ctx.setProperty("source_camera_frame_rate", numpy.float32(1.0))
+#     ctx.setProperty("source_camera_gain_max", numpy.float32(1.0))
+#     ctx.setProperty("source_camera_edge_enhance_strength", numpy.float32(0.0))
+#     orig0 = ctx.readTopic("image_orig_0")
+#     orig1 = ctx.readTopic("image_orig_1")
+#     run = (orig0.data.timestamp == orig1.data.timestamp)
+#     print("Difference", orig0.data.timestamp - orig1.data.timestamp)
+#     rgb0 = unpackMessageToNumpy(orig0.data)
+#     rgb0 = formatNumpyToRGB(rgb0)
+#     rgb1 = unpackMessageToNumpy(orig1.data)
+#     rgb1 = formatNumpyToRGB(rgb1)
+#     rgb = numpy.concatenate((rgb0, rgb1))
+#     rgb = cv2.cvtColor(rgb, cv2.COLOR_BGR2RGB)  # opencv expects BGR images, we use RGB
+#     cv2.imwrite("test.png", rgb)  # store it to your desired path
+
+
 @app.post("/single_shot")
 def see_raw_image(cam_ip: str = Form(...)):
-
     ctx = Context(appname="stereo", server=cam_ip, port="8888")
     # Save Image
-    msg = ctx.readTopic("image")
-    np = unpackMessageToNumpy(msg.data)
-    # msg = ctx.readTopic("distance")
+    msg = ctx.readTopic("distance")
+    im = ctx.readTopic("image")
+    np = unpackMessageToNumpy(im.data)
 
     # 3D distance map to list
     distance = unpackMessageToNumpy(msg.data)
