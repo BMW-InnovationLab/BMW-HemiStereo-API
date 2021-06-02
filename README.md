@@ -98,7 +98,7 @@ Returns a picture captured by the camera. This is a raw image, hence no objects 
 
 This endpoint returns and saves the raw image with its distance map.
 
-![](/docs/singleshot_distance.gif)
+![](/docs/singleshot_distance.png)
 
 ##### /set_threshold (POST)
 
