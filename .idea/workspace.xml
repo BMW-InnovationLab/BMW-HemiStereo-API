@@ -2,7 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c6ec6a84-3441-4f27-b921-5304ab71f614" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/src/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/detect_object.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/set_camera_settings.gif" beforeDir="false" afterPath="$PROJECT_DIR$/docs/set_camera_settings.gif" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/set_threshold.gif" beforeDir="false" afterPath="$PROJECT_DIR$/docs/set_threshold.gif" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/singleshot.gif" beforeDir="false" afterPath="$PROJECT_DIR$/docs/singleshot.gif" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/camera_to_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/camera_to_server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/images/distance_map.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/distance_map.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/images/labeled_image.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/labeled_image.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/images/raw+dist.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/raw+dist.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/images/raw_image.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/images/raw_image.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -2,9 +2,7 @@
 
 This is a repository for an object detection inference API using the Hemistereo NX 180 X camera.
 
-It allows you to label an object based on the training of a model from the deeplearning06.muc:4344/ server. Also, it allows you to calculate the distance of the object from the camera, as well as its dimensions: depth, width and height.
-
-*Note that to use the deeplearning server, you have to be connected to the BMW Network.*
+It allows you to label an object based on the training of a model from a server. Also, it allows you to calculate the distance of the object from the camera, as well as its dimensions: depth, width and height.
 
 ## Prerequisites
 
@@ -100,6 +98,8 @@ Returns a picture captured by the camera. This is a raw image, hence no objects 
 
 This endpoint returns and saves the raw image with its distance map.
 
+![](/docs/singleshot_distance.gif)
+
 ##### /set_threshold (POST)
 
 Allows the user to manually calibrate the camera in terms of textureness threshold.
@@ -112,7 +112,7 @@ Performs object detection and labeling on a specific object based on the trained
 
 It returns bounding boxes, distance and dimensions: width, depth and height.
 
-![](/docs/detect_object.gif)
+![](/docs/detect.png)
 
 ##### /detect_input (POST)
 
@@ -154,7 +154,7 @@ Usually, the more the object is far from the camera, the more you increase the t
 
 ![](/docs/textureness_threshold.gif)
 
-There are much more parameters you can change and play around with but these are the most used ones for camera calibration.
+There are much more parameters you can change and play around with, but these are the most used ones for camera calibration.
 
 
 
