@@ -156,5 +156,8 @@ Usually, the more the object is far from the camera, the more you increase the t
 
 There are much more parameters you can change and play around with, but these are the most used ones for camera calibration.
 
+#References
+
+https://rami-naffah.medium.com/how-to-use-a-stereo-camera-for-object-detection-and-measurement-bmw-no-code-ai-4e4319952a3
 
 
